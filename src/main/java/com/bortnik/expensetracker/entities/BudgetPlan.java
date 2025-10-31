@@ -35,6 +35,6 @@ public class BudgetPlan {
     @Column(name = "spent_amount", nullable = false)
     private Double spentAmount;
 
-    @Column
+    @Column(nullable = false)
     private LocalDate month;
 }
