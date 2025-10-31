@@ -35,6 +35,9 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+
+    testImplementation("io.mockk:mockk:1.13.9")
 }
 
 tasks.withType<Test> {
