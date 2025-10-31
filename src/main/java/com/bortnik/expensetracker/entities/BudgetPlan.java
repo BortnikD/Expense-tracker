@@ -29,10 +29,10 @@ public class BudgetPlan {
     @Column(name = "category_id", nullable = false)
     private UUID categoryId;
 
-    @Column(name = "limit_amount", precision = 15, scale = 2, nullable = false)
+    @Column(name = "limit_amount", nullable = false)
     private Double limitAmount;
 
-    @Column(name = "spent_amount", precision = 15, scale = 2, nullable = false)
+    @Column(name = "spent_amount", nullable = false)
     private Double spentAmount;
 
     @Column

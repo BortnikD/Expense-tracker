@@ -24,7 +24,7 @@ public class Expenses {
     @Column(name = "category_id", nullable = false)
     private UUID categoryId;
 
-    @Column(nullable = false, precision = 15, scale = 2)
+    @Column(nullable = false)
     private Double amount;
 
     @Column(nullable = false)
