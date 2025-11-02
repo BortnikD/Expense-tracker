@@ -6,6 +6,7 @@ import com.bortnik.expensetracker.exceptions.user.UserNotFound;
 import com.bortnik.expensetracker.exceptions.user.UserAlreadyExists;
 import com.bortnik.expensetracker.mappers.UserMapper;
 import com.bortnik.expensetracker.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ import java.util.UUID;
 public class UserService {
     private final UserRepository userRepository;
 
+    @Transactional
     public UserDTO saveUser(CreateUserDTO user) {
         if (userRepository.existsByUsername(user.getUsername())) {
             throw new UserAlreadyExists("user with username = " + user.getUsername() + " already exists");

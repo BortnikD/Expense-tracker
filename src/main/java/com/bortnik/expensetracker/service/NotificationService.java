@@ -6,6 +6,7 @@ import com.bortnik.expensetracker.entities.Notification;
 import com.bortnik.expensetracker.exceptions.notification.NotificationNotFound;
 import com.bortnik.expensetracker.mappers.NotificationMapper;
 import com.bortnik.expensetracker.repository.NotificationRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +17,7 @@ import java.util.UUID;
 public class NotificationService {
     private final NotificationRepository notificationRepository;
 
+    @Transactional
     public Notification saveNotification(final NotificationCreateDTO notificationCreateDTO) {
         return notificationRepository.save(NotificationMapper.toEntity(notificationCreateDTO));
     }
@@ -37,6 +39,7 @@ public class NotificationService {
                 .map(NotificationMapper::toDto);
     }
 
+    @Transactional
     public void markNotificationAsRead(final UUID notificationId) {
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() ->

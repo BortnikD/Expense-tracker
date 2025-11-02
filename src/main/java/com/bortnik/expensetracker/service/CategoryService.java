@@ -9,6 +9,7 @@ import com.bortnik.expensetracker.exceptions.category.CategoryNotFound;
 import com.bortnik.expensetracker.exceptions.user.AccessError;
 import com.bortnik.expensetracker.mappers.CategoryMapper;
 import com.bortnik.expensetracker.repository.CategoryRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,7 @@ import java.util.UUID;
 public class CategoryService {
     private final CategoryRepository categoryRepository;
 
+    @Transactional
     public CategoryDTO saveCategory(CreateCategoryDTO createCategoryDTO) {
         if (categoryRepository.existsByUserIdAndName(createCategoryDTO.getUserId(), createCategoryDTO.getName())) {
             throw new CategoryAlreadyExists("Category with name " + createCategoryDTO.getName() +
@@ -30,6 +32,7 @@ public class CategoryService {
         );
     }
 
+    @Transactional
     public CategoryDTO updateCategory(CategoryUpdate categoryUpdate) {
         Category category = categoryRepository.findById(categoryUpdate.getId())
                 .orElseThrow(() ->
