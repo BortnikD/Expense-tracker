@@ -3,6 +3,7 @@ package com.bortnik.expensetracker.service;
 import com.bortnik.expensetracker.dto.notification.NotificationCreateDTO;
 import com.bortnik.expensetracker.dto.notification.NotificationDTO;
 import com.bortnik.expensetracker.entities.Notification;
+import com.bortnik.expensetracker.exceptions.notification.NotificationNotFound;
 import com.bortnik.expensetracker.mappers.NotificationMapper;
 import com.bortnik.expensetracker.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,5 +35,14 @@ public class NotificationService {
     ) {
         return notificationRepository.findByUserIdAndReadOrderByCreatedAtDesc(userId, isRead, pageable)
                 .map(NotificationMapper::toDto);
+    }
+
+    public void markNotificationAsRead(final UUID notificationId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() ->
+                        new NotificationNotFound("Notification with id " + notificationId + " does not exist"));
+
+        notification.setRead(true);
+        notificationRepository.save(notification);
     }
 }
