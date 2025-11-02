@@ -4,11 +4,18 @@ import com.bortnik.expensetracker.entities.BudgetPlan;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface BudgetPlanRepository extends JpaRepository<BudgetPlan, UUID> {
 
-    BudgetPlan findByUserIdAndCategoryIdAndMonth(UUID userId, UUID categoryId, LocalDate month);
+    Optional<BudgetPlan> findByUserIdAndCategoryIdAndMonthBetween(
+            UUID userId,
+            UUID categoryId,
+            LocalDate startMonth,
+            LocalDate endMonth);
 
-    BudgetPlan findByUserIdAndMonth(UUID userId, LocalDate month);
+    Optional<BudgetPlan> findByUserIdAndMonth(UUID userId, LocalDate month);
+
+    boolean existsByUserIdAndMonthBetween(UUID userId, LocalDate startMonth, LocalDate endMonth);
 }
