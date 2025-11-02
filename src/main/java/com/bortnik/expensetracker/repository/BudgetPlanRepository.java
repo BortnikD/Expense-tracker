@@ -15,7 +15,7 @@ public interface BudgetPlanRepository extends JpaRepository<BudgetPlan, UUID> {
             LocalDate startMonth,
             LocalDate endMonth);
 
-    Optional<BudgetPlan> findByUserIdAndMonth(UUID userId, LocalDate month);
+    Optional<BudgetPlan> findByUserIdAndMonthBetween(UUID userId, LocalDate startMonth, LocalDate endMonth);
 
     boolean existsByUserIdAndMonthBetween(UUID userId, LocalDate startMonth, LocalDate endMonth);
 }

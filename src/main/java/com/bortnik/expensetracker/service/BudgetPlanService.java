@@ -39,8 +39,10 @@ public class BudgetPlanService {
             final UUID userId,
             final LocalDate month
     ) {
+        final LocalDate startMonth = month.withDayOfMonth(1);
+        final LocalDate endMonth = month.withDayOfMonth(month.lengthOfMonth());
         return BudgetPlanMapper.toDto(
-                budgetPlanRepository.findByUserIdAndMonth(userId, month)
+                budgetPlanRepository.findByUserIdAndMonthBetween(userId, startMonth, endMonth)
                         .orElseThrow(() -> new BudgetPlanNotFound("Budget plan for user with id " + userId +
                                 " and month " + month + " does not exist"))
         );
@@ -64,13 +66,27 @@ public class BudgetPlanService {
                 .orElseThrow(() ->
                         new BudgetPlanNotFound("Budget plan with id " + budgetPlanUpdateDTO.getId() + " does not exist"));
 
+        if (!budgetPlan.getUserId().equals(budgetPlanUpdateDTO.getUserId())) {
+            throw new AccessError("You do not have access to this budget plan");
+        }
+
         budgetPlan.setLimitAmount(budgetPlanUpdateDTO.getLimitAmount());
         budgetPlan.setSpentAmount(budgetPlanUpdateDTO.getSpentAmount());
         return BudgetPlanMapper.toDto(budgetPlanRepository.save(budgetPlan));
     }
 
+    /**
+     * Deletes an existing budget plan identified by its ID and verifies that the user has access
+     * to the specified budget plan.
+     *
+     * @param id the unique identifier of the budget plan to be deleted
+     * @param userId the unique identifier of the user requesting the deletion
+     * @return the deleted budget plan details as a {@link BudgetPlanDTO} object
+     * @throws BudgetPlanNotFound if the budget plan with the specified ID does not exist
+     * @throws AccessError if the user does not have access to the specified budget plan
+     */
     @Transactional
-    public void deleteBudgetPlan(final UUID id, final UUID userId) {
+    public BudgetPlanDTO deleteBudgetPlan(final UUID id, final UUID userId) {
         BudgetPlan budgetPlan = budgetPlanRepository.findById(id)
                 .orElseThrow(() ->
                         new BudgetPlanNotFound("Budget plan with id " + id + " does not exist"));
@@ -80,5 +96,6 @@ public class BudgetPlanService {
         }
 
         budgetPlanRepository.deleteById(id);
+        return BudgetPlanMapper.toDto(budgetPlan);
     }
 }

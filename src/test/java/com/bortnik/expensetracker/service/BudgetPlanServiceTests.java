@@ -1,4 +1,3 @@
-
 package com.bortnik.expensetracker.service;
 
 import com.bortnik.expensetracker.dto.budget.BudgetPlanCreateDTO;
@@ -20,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class BudgetPlanServiceTests {
+class BudgetPlanServiceTests {
 
     private final BudgetPlanRepository budgetPlanRepository = mock(BudgetPlanRepository.class);
     private final BudgetPlanService budgetPlanService = new BudgetPlanService(budgetPlanRepository);
@@ -64,6 +63,7 @@ public class BudgetPlanServiceTests {
 
     private final BudgetPlanUpdateDTO budgetPlanUpdateDTO = BudgetPlanUpdateDTO.builder()
             .id(budgetPlanId)
+            .userId(userId)
             .limitAmount(updatedLimitAmount)
             .spentAmount(updatedSpentAmount)
             .build();
@@ -92,7 +92,7 @@ public class BudgetPlanServiceTests {
 
     @Test
     void getBudgetPlanByUserIdAndMonth_ShouldReturnBudgetPlan() {
-        when(budgetPlanRepository.findByUserIdAndMonth(userId, month))
+        when(budgetPlanRepository.findByUserIdAndMonthBetween(userId, startOfMonth, endOfMonth))
                 .thenReturn(Optional.of(budgetPlan));
 
         final BudgetPlanDTO result = budgetPlanService.getBudgetPlanByUserIdAndMonth(userId, month);
@@ -102,7 +102,7 @@ public class BudgetPlanServiceTests {
 
     @Test
     void getBudgetPlanByUserIdAndMonth_ShouldThrowException_WhenBudgetPlanNotFound() {
-        when(budgetPlanRepository.findByUserIdAndMonth(userId, month))
+        when(budgetPlanRepository.findByUserIdAndMonthBetween(userId, startOfMonth, endOfMonth))
                 .thenReturn(Optional.empty());
 
         final var exception = assertThrows(BudgetPlanNotFound.class,
@@ -165,11 +165,40 @@ public class BudgetPlanServiceTests {
     }
 
     @Test
-    void deleteBudgetPlan_ShouldDeleteBudgetPlan() {
+    void updateBudgetPlan_ShouldThrowAccessError_WhenUserDoesNotOwnBudgetPlan() {
+        final UUID otherUserId = UUID.randomUUID();
+        final BudgetPlan budgetPlanOwnedByOtherUser = BudgetPlan.builder()
+                .id(budgetPlanId)
+                .userId(otherUserId)
+                .categoryId(categoryId)
+                .limitAmount(limitAmount)
+                .spentAmount(spentAmount)
+                .month(month)
+                .build();
+
+        final BudgetPlanUpdateDTO updateDTOWithWrongUser = BudgetPlanUpdateDTO.builder()
+                .id(budgetPlanId)
+                .userId(userId)
+                .limitAmount(updatedLimitAmount)
+                .spentAmount(updatedSpentAmount)
+                .build();
+
+        when(budgetPlanRepository.findById(budgetPlanId)).thenReturn(Optional.of(budgetPlanOwnedByOtherUser));
+
+        final var exception = assertThrows(AccessError.class,
+                () -> budgetPlanService.updateBudgetPlan(updateDTOWithWrongUser));
+
+        assertEquals("You do not have access to this budget plan", exception.getMessage());
+        verify(budgetPlanRepository, never()).save(any(BudgetPlan.class));
+    }
+
+    @Test
+    void deleteBudgetPlan_ShouldDeleteBudgetPlanAndReturnDTO() {
         when(budgetPlanRepository.findById(budgetPlanId)).thenReturn(Optional.of(budgetPlan));
 
-        budgetPlanService.deleteBudgetPlan(budgetPlanId, userId);
+        final BudgetPlanDTO result = budgetPlanService.deleteBudgetPlan(budgetPlanId, userId);
 
+        assertEquals(budgetPlanDTO, result);
         verify(budgetPlanRepository).deleteById(budgetPlanId);
     }
 
