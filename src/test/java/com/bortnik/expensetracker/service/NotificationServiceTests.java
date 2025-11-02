@@ -3,16 +3,17 @@ package com.bortnik.expensetracker.service;
 import com.bortnik.expensetracker.dto.notification.NotificationCreateDTO;
 import com.bortnik.expensetracker.dto.notification.NotificationDTO;
 import com.bortnik.expensetracker.entities.Notification;
+import com.bortnik.expensetracker.exceptions.notification.NotificationNotFound;
 import com.bortnik.expensetracker.repository.NotificationRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.*;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -108,6 +109,40 @@ public class NotificationServiceTests {
 
         assertEquals(0, result.getTotalElements());
         assertTrue(result.getContent().isEmpty());
+    }
+
+    @Test
+    void markNotificationAsRead_ShouldSetReadTrue_AndSave_WhenNotificationExists() {
+        UUID id = UUID.randomUUID();
+        Notification notification = new Notification();
+        notification.setId(id);
+        notification.setRead(false);
+
+        when(notificationRepository.findById(id)).thenReturn(Optional.of(notification));
+
+        notificationService.markNotificationAsRead(id);
+
+        assertTrue(notification.isRead());
+        verify(notificationRepository).findById(id);
+        verify(notificationRepository).save(notification);
+        verifyNoMoreInteractions(notificationRepository);
+    }
+
+    @Test
+    void markNotificationAsRead_ShouldThrowException_WhenNotificationNotFound() {
+        UUID id = UUID.randomUUID();
+        when(notificationRepository.findById(id)).thenReturn(Optional.empty());
+
+        NotificationNotFound exception = assertThrows(
+                NotificationNotFound.class,
+                () -> notificationService.markNotificationAsRead(id)
+        );
+
+        assertEquals("Notification with id " + id + " does not exist", exception.getMessage());
+
+        verify(notificationRepository).findById(id);
+        verify(notificationRepository, never()).save(any());
+        verifyNoMoreInteractions(notificationRepository);
     }
 }
 
