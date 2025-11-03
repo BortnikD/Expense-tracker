@@ -1,6 +1,6 @@
 package com.bortnik.expensetracker.service;
 
-import com.bortnik.expensetracker.dto.user.CreateUserDTO;
+import com.bortnik.expensetracker.dto.user.UserCreateDTO;
 import com.bortnik.expensetracker.dto.user.UserDTO;
 import com.bortnik.expensetracker.exceptions.user.UserNotFound;
 import com.bortnik.expensetracker.exceptions.user.UserAlreadyExists;
@@ -18,7 +18,7 @@ public class UserService {
     private final UserRepository userRepository;
 
     @Transactional
-    public UserDTO saveUser(CreateUserDTO user) {
+    public UserDTO saveUser(UserCreateDTO user) {
         if (userRepository.existsByUsername(user.getUsername())) {
             throw new UserAlreadyExists("user with username = " + user.getUsername() + " already exists");
         }

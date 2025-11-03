@@ -1,11 +1,11 @@
 package com.bortnik.expensetracker.mappers;
 
-import com.bortnik.expensetracker.dto.user.CreateUserDTO;
+import com.bortnik.expensetracker.dto.user.UserCreateDTO;
 import com.bortnik.expensetracker.dto.user.UserDTO;
 import com.bortnik.expensetracker.entities.User;
 
 public class UserMapper {
-    public static User toEntity(CreateUserDTO user) {
+    public static User toEntity(UserCreateDTO user) {
         return User.builder()
                 .username(user.getUsername())
                 .email(user.getEmail())

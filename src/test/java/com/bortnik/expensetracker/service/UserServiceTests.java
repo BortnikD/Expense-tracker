@@ -1,6 +1,6 @@
 package com.bortnik.expensetracker.service;
 
-import com.bortnik.expensetracker.dto.user.CreateUserDTO;
+import com.bortnik.expensetracker.dto.user.UserCreateDTO;
 import com.bortnik.expensetracker.dto.user.UserDTO;
 import com.bortnik.expensetracker.entities.User;
 import com.bortnik.expensetracker.exceptions.user.UserAlreadyExists;
@@ -25,7 +25,7 @@ public class UserServiceTests {
     private final String username = "username";
     private final String email = "email@gmail.com";
 
-    private final CreateUserDTO createUserDTO = CreateUserDTO.builder()
+    private final UserCreateDTO createUserDTO = UserCreateDTO.builder()
             .username(username)
             .email(email)
             .build();
