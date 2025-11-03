@@ -11,6 +11,7 @@ import com.bortnik.expensetracker.exceptions.notification.NotificationNotFound;
 import com.bortnik.expensetracker.exceptions.user.AccessError;
 import com.bortnik.expensetracker.exceptions.user.UserAlreadyExists;
 import com.bortnik.expensetracker.exceptions.user.UserNotFound;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -163,6 +164,18 @@ public class ExceptionsHandler {
                         .message("Invalid fields")
                         .status(HttpStatus.BAD_REQUEST)
                         .meta(fieldErrors)
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    ResponseEntity<ApiError> handleException(ConstraintViolationException exception) {
+        return buildResponseEntity(
+                ApiError.builder()
+                        .timestamp(LocalDateTime.now())
+                        .error("Constraint Violation Exception")
+                        .message(exception.getMessage())
+                        .status(HttpStatus.BAD_REQUEST)
                         .build()
         );
     }
