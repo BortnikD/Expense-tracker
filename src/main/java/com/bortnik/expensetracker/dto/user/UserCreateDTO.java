@@ -21,6 +21,6 @@ public class UserCreateDTO {
     private String email;
 
     @NotBlank(message = "Password is required")
-    @Size(min = 8, message = "Password must be great then 8")
+    @Size(min = 8, max = 255, message = "Password must be great then 8")
     private String password;
 }
