@@ -1,8 +1,8 @@
 package com.bortnik.expensetracker.service;
 
 import com.bortnik.expensetracker.dto.category.CategoryDTO;
-import com.bortnik.expensetracker.dto.category.CategoryUpdate;
-import com.bortnik.expensetracker.dto.category.CreateCategoryDTO;
+import com.bortnik.expensetracker.dto.category.CategoryUpdateDTO;
+import com.bortnik.expensetracker.dto.category.CategoryCreateDTO;
 import com.bortnik.expensetracker.entities.Category;
 import com.bortnik.expensetracker.exceptions.category.CategoryAlreadyExists;
 import com.bortnik.expensetracker.exceptions.category.CategoryNotFound;
@@ -22,7 +22,7 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
 
     @Transactional
-    public CategoryDTO saveCategory(CreateCategoryDTO createCategoryDTO) {
+    public CategoryDTO saveCategory(CategoryCreateDTO createCategoryDTO) {
         if (categoryRepository.existsByUserIdAndName(createCategoryDTO.getUserId(), createCategoryDTO.getName())) {
             throw new CategoryAlreadyExists("Category with name " + createCategoryDTO.getName() +
                     " and userId " + createCategoryDTO.getUserId() + " already exists");
@@ -33,7 +33,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryDTO updateCategory(CategoryUpdate categoryUpdate) {
+    public CategoryDTO updateCategory(CategoryUpdateDTO categoryUpdate) {
         Category category = categoryRepository.findById(categoryUpdate.getId())
                 .orElseThrow(() ->
                         new CategoryNotFound("Category with id " + categoryUpdate.getId() + " does not exist"));
@@ -46,7 +46,7 @@ public class CategoryService {
         return CategoryMapper.toDto(categoryRepository.save(category));
     }
 
-    public List<CategoryDTO> findByUserId(final UUID userId) {
+    public List<CategoryDTO> getAllByUserId(final UUID userId) {
         return categoryRepository.findByUserId(userId)
                 .stream()
                 .map(CategoryMapper::toDto)

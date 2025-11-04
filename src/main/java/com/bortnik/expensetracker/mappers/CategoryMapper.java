@@ -1,7 +1,7 @@
 package com.bortnik.expensetracker.mappers;
 
 import com.bortnik.expensetracker.dto.category.CategoryDTO;
-import com.bortnik.expensetracker.dto.category.CreateCategoryDTO;
+import com.bortnik.expensetracker.dto.category.CategoryCreateDTO;
 import com.bortnik.expensetracker.entities.Category;
 
 public class CategoryMapper {
@@ -13,7 +13,7 @@ public class CategoryMapper {
                 .build();
     }
 
-    public static Category toEntity(CreateCategoryDTO categoryCreateDTO) {
+    public static Category toEntity(CategoryCreateDTO categoryCreateDTO) {
         return Category.builder()
                 .name(categoryCreateDTO.getName())
                 .userId(categoryCreateDTO.getUserId())

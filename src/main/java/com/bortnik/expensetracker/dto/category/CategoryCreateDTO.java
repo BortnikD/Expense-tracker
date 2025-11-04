@@ -12,7 +12,7 @@ import java.util.UUID;
 @Data
 @Builder
 @AllArgsConstructor
-public class CreateCategoryDTO {
+public class CategoryCreateDTO {
 
     @NotBlank(message = "userId is required")
     @Positive(message = "userId must be positive")

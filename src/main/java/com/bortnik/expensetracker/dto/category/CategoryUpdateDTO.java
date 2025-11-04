@@ -9,7 +9,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @Builder
-public class CategoryUpdate {
+public class CategoryUpdateDTO {
     private final UUID id;
     private final UUID userId;
     private final String name;

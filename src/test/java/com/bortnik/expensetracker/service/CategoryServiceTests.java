@@ -1,8 +1,8 @@
 package com.bortnik.expensetracker.service;
 
 import com.bortnik.expensetracker.dto.category.CategoryDTO;
-import com.bortnik.expensetracker.dto.category.CategoryUpdate;
-import com.bortnik.expensetracker.dto.category.CreateCategoryDTO;
+import com.bortnik.expensetracker.dto.category.CategoryUpdateDTO;
+import com.bortnik.expensetracker.dto.category.CategoryCreateDTO;
 import com.bortnik.expensetracker.entities.Category;
 import com.bortnik.expensetracker.exceptions.category.CategoryAlreadyExists;
 import com.bortnik.expensetracker.exceptions.category.CategoryNotFound;
@@ -28,7 +28,7 @@ public class CategoryServiceTests {
     private final String categoryName = "Food";
     private final String updatedName = "Groceries";
 
-    private final CreateCategoryDTO createCategoryDTO = CreateCategoryDTO.builder()
+    private final CategoryCreateDTO createCategoryDTO = CategoryCreateDTO.builder()
             .userId(userId)
             .name(categoryName)
             .build();
@@ -69,7 +69,7 @@ public class CategoryServiceTests {
 
     @Test
     void updateCategory_ShouldUpdateCategory() {
-        final CategoryUpdate update = CategoryUpdate.builder()
+        final CategoryUpdateDTO update = CategoryUpdateDTO.builder()
                 .id(categoryId)
                 .userId(userId)
                 .name(updatedName)
@@ -98,7 +98,7 @@ public class CategoryServiceTests {
 
     @Test
     void updateCategory_ShouldThrowException_WhenCategoryNotFound() {
-        final CategoryUpdate update = CategoryUpdate.builder()
+        final CategoryUpdateDTO update = CategoryUpdateDTO.builder()
                 .id(categoryId)
                 .userId(userId)
                 .name(updatedName)
@@ -114,7 +114,7 @@ public class CategoryServiceTests {
 
     @Test
     void updateCategory_ShouldThrowAccessError_WhenUserDoesNotOwnCategory() {
-        final CategoryUpdate update = CategoryUpdate.builder()
+        final CategoryUpdateDTO update = CategoryUpdateDTO.builder()
                 .id(categoryId)
                 .userId(UUID.randomUUID())
                 .name(updatedName)
@@ -132,7 +132,7 @@ public class CategoryServiceTests {
     void findByUserId_ShouldReturnCategoryList() {
         when(categoryRepository.findByUserId(userId)).thenReturn(List.of(category));
 
-        final List<CategoryDTO> result = categoryService.findByUserId(userId);
+        final List<CategoryDTO> result = categoryService.getAllByUserId(userId);
 
         assertEquals(1, result.size());
         assertEquals(categoryDTO, result.getFirst());
@@ -142,7 +142,7 @@ public class CategoryServiceTests {
     void findByUserId_ShouldReturnEmptyList_WhenNoCategoriesFound() {
         when(categoryRepository.findByUserId(userId)).thenReturn(List.of());
 
-        final List<CategoryDTO> result = categoryService.findByUserId(userId);
+        final List<CategoryDTO> result = categoryService.getAllByUserId(userId);
 
         assertTrue(result.isEmpty());
     }
