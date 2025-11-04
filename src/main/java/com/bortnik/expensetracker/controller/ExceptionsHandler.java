@@ -1,6 +1,7 @@
 package com.bortnik.expensetracker.controller;
 
 import com.bortnik.expensetracker.dto.ApiError;
+import com.bortnik.expensetracker.exceptions.BadRequest;
 import com.bortnik.expensetracker.exceptions.auth.InvalidJwtToken;
 import com.bortnik.expensetracker.exceptions.budget.BudgetPlanAlreadyExists;
 import com.bortnik.expensetracker.exceptions.budget.BudgetPlanNotFound;
@@ -174,6 +175,18 @@ public class ExceptionsHandler {
                 ApiError.builder()
                         .timestamp(LocalDateTime.now())
                         .error("Constraint Violation Exception")
+                        .message(exception.getMessage())
+                        .status(HttpStatus.BAD_REQUEST)
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(BadRequest.class)
+    ResponseEntity<ApiError> handleException(BadRequest exception) {
+        return buildResponseEntity(
+                ApiError.builder()
+                        .timestamp(LocalDateTime.now())
+                        .error("Bad Request")
                         .message(exception.getMessage())
                         .status(HttpStatus.BAD_REQUEST)
                         .build()

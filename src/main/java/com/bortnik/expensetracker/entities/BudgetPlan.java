@@ -16,7 +16,7 @@ import java.util.UUID;
 @Entity
 @Table(
         name = "budget_plans",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "name", "month"})
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "category_id", "month"})
 )
 public class BudgetPlan {
     @Id
@@ -26,7 +26,7 @@ public class BudgetPlan {
     @Column(name = "user_id", nullable = false)
     private UUID userId;
 
-    @Column(name = "category_id", nullable = false)
+    @Column(name = "category_id")
     private UUID categoryId;
 
     @Column(name = "limit_amount", nullable = false)
