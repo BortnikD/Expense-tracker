@@ -3,6 +3,7 @@ package com.bortnik.expensetracker.service;
 import com.bortnik.expensetracker.dto.budget.BudgetPlanCreateDTO;
 import com.bortnik.expensetracker.dto.budget.BudgetPlanDTO;
 import com.bortnik.expensetracker.dto.budget.BudgetPlanUpdateDTO;
+import com.bortnik.expensetracker.dto.budget.BudgetUpdateExpenses;
 import com.bortnik.expensetracker.entities.BudgetPlan;
 import com.bortnik.expensetracker.exceptions.budget.BudgetPlanNotFound;
 import com.bortnik.expensetracker.exceptions.budget.BudgetPlanAlreadyExists;
@@ -11,9 +12,13 @@ import com.bortnik.expensetracker.mappers.BudgetPlanMapper;
 import com.bortnik.expensetracker.repository.BudgetPlanRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -42,14 +47,57 @@ public class BudgetPlanService {
         final LocalDate startMonth = month.withDayOfMonth(1);
         final LocalDate endMonth = month.withDayOfMonth(month.lengthOfMonth());
         return BudgetPlanMapper.toDto(
-                budgetPlanRepository.findByUserIdAndMonthBetween(userId, startMonth, endMonth)
+                budgetPlanRepository.findByUserIdAndCategoryIdIsNullAndMonthBetween(userId, startMonth, endMonth)
                         .orElseThrow(() -> new BudgetPlanNotFound("Budget plan for user with id " + userId +
                                 " and month " + month + " does not exist"))
         );
     }
 
+    public Optional<BudgetPlanDTO> getOptionalBudgetPlanByUserIdAndCategoryIdAndMonth(
+            UUID userId,
+            UUID categoryId,
+            LocalDate month
+    ) {
+        LocalDate startMonth = month.withDayOfMonth(1);
+        LocalDate endMonth = month.withDayOfMonth(month.lengthOfMonth());
+
+        return budgetPlanRepository.findByUserIdAndCategoryIdAndMonthBetween(userId, categoryId, startMonth, endMonth)
+                .map(BudgetPlanMapper::toDto);
+    }
+
+    public Optional<BudgetPlanDTO> getOptionalBudgetPlanByUserIdAndMonth(
+            UUID userId,
+            LocalDate month
+    ) {
+        LocalDate startMonth = month.withDayOfMonth(1);
+        LocalDate endMonth = month.withDayOfMonth(month.lengthOfMonth());
+
+        return budgetPlanRepository.findByUserIdAndCategoryIdIsNullAndMonthBetween(userId, startMonth, endMonth)
+                .map(BudgetPlanMapper::toDto);
+    }
+
+    public List<BudgetPlanDTO> getExceedingBudgetPlans(final UUID userId) {
+        return budgetPlanRepository.findByUserIdAndSpentAmountExceedsLimit(userId)
+                .stream()
+                .map(BudgetPlanMapper::toDto)
+                .toList();
+    }
+
+    public List<BudgetPlanDTO> getBudgetPlansByUserIdAndMonth(final UUID userId, final LocalDate month) {
+        LocalDate startMonth = month.withDayOfMonth(1);
+        LocalDate endMonth = month.withDayOfMonth(month.lengthOfMonth());
+        return budgetPlanRepository.findByUserIdAndMonthBetween(userId, startMonth, endMonth)
+                .stream()
+                .map(BudgetPlanMapper::toDto)
+                .toList();
+    }
+
+    public Page<BudgetPlanDTO> getAllBudgetPlans(final UUID userId, Pageable pageable) {
+        return budgetPlanRepository.findByUserId(userId, pageable).map(BudgetPlanMapper::toDto);
+    }
+
     @Transactional
-    public BudgetPlanDTO saveBudgetPlan(final BudgetPlanCreateDTO budgetPlanCreateDTO) {
+    public BudgetPlanDTO createBudgetPlan(final BudgetPlanCreateDTO budgetPlanCreateDTO) {
         if (budgetPlanRepository.existsByUserIdAndMonthBetween(
                 budgetPlanCreateDTO.getUserId(), budgetPlanCreateDTO.getMonth(), budgetPlanCreateDTO.getMonth())
         ) {
@@ -71,8 +119,27 @@ public class BudgetPlanService {
         }
 
         budgetPlan.setLimitAmount(budgetPlanUpdateDTO.getLimitAmount());
-        budgetPlan.setSpentAmount(budgetPlanUpdateDTO.getSpentAmount());
         return BudgetPlanMapper.toDto(budgetPlanRepository.save(budgetPlan));
+    }
+
+    /**
+     * Updates the spent amount in the budget plan by appending additional expenses.
+     * Retrieves the budget plan based on the identifier provided and updates the spent amount
+     * by adding the value of the expenses. If the budget plan does not exist, an exception is thrown.
+     *
+     * @param budgetUpdateExpenses an object containing the ID of the budget plan to update and
+     *                             the amount of expenses to append
+     * @throws BudgetPlanNotFound if the budget plan with the specified ID does not exist
+     */
+    @Transactional
+    public void appendExpensesToBudgetPlan(final BudgetUpdateExpenses budgetUpdateExpenses) {
+        BudgetPlan budgetPlan = budgetPlanRepository.findById(budgetUpdateExpenses.getId())
+                .orElseThrow(() -> new BudgetPlanNotFound("Budget plan with id " + budgetUpdateExpenses.getId() +
+                        " does not exist"));
+
+        budgetPlan.setSpentAmount(budgetPlan.getSpentAmount() + budgetUpdateExpenses.getSpentAmount());
+
+        BudgetPlanMapper.toDto(budgetPlanRepository.save(budgetPlan));
     }
 
     /**

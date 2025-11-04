@@ -1,5 +1,7 @@
 package com.bortnik.expensetracker.service;
 
+import com.bortnik.expensetracker.dto.budget.BudgetPlanDTO;
+import com.bortnik.expensetracker.dto.budget.BudgetUpdateExpenses;
 import com.bortnik.expensetracker.dto.expenses.ExpensesCreateDTO;
 import com.bortnik.expensetracker.dto.expenses.ExpensesDTO;
 import com.bortnik.expensetracker.dto.expenses.ExpensesUpdateDTO;
@@ -10,6 +12,7 @@ import com.bortnik.expensetracker.mappers.ExpensesMapper;
 import com.bortnik.expensetracker.repository.ExpensesRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -18,16 +21,20 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ExpensesService {
     private final ExpensesRepository expensesRepository;
+    private final BudgetPlanService budgetPlanService;
 
     @Transactional
     public ExpensesDTO createExpenses(final ExpensesCreateDTO expensesCreateDTO) {
-        return ExpensesMapper.toDto(
+        ExpensesDTO expensesDTO = ExpensesMapper.toDto(
                 expensesRepository.save(
                         ExpensesMapper.toEntity(expensesCreateDTO)
                 )
         );
+        updateBudgetPlans(expensesDTO);
+        return expensesDTO;
     }
 
     public List<ExpensesDTO> getExpensesBetweenDates(
@@ -84,5 +91,28 @@ public class ExpensesService {
         expenses.setDate(expensesUpdateDTO.getDate());
         expenses.setDescription(expensesUpdateDTO.getDescription());
         return ExpensesMapper.toDto(expensesRepository.save(expenses));
+    }
+
+    private void updateBudgetPlans(ExpensesDTO expensesDTO) {
+        LocalDate currentMonth = LocalDate.now();
+
+        budgetPlanService.getOptionalBudgetPlanByUserIdAndCategoryIdAndMonth(
+                        expensesDTO.getUserId(), expensesDTO.getCategoryId(), currentMonth)
+                .map(BudgetPlanDTO::getId)
+                .ifPresent(id -> updateBudgetPlan(id, expensesDTO.getAmount(), "Category"));
+
+        budgetPlanService.getOptionalBudgetPlanByUserIdAndMonth(
+                        expensesDTO.getUserId(), currentMonth)
+                .map(BudgetPlanDTO::getId)
+                .ifPresent(id -> updateBudgetPlan(id, expensesDTO.getAmount(), "User"));
+    }
+
+    private void updateBudgetPlan(UUID id, double amount, String type) {
+        budgetPlanService.appendExpensesToBudgetPlan(
+                BudgetUpdateExpenses.builder()
+                        .id(id)
+                        .spentAmount(amount)
+                        .build());
+        log.info("{} budget plan with id {} updated with spent amount {}", type, id, amount);
     }
 }

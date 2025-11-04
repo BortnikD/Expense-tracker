@@ -13,5 +13,4 @@ public class BudgetPlanUpdateDTO {
     private UUID id;
     private UUID userId;
     private Double limitAmount;
-    private Double spentAmount;
 }
