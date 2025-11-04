@@ -4,6 +4,7 @@ import com.bortnik.expensetracker.dto.notification.NotificationCreateDTO;
 import com.bortnik.expensetracker.dto.notification.NotificationDTO;
 import com.bortnik.expensetracker.entities.Notification;
 import com.bortnik.expensetracker.exceptions.notification.NotificationNotFound;
+import com.bortnik.expensetracker.exceptions.user.AccessError;
 import com.bortnik.expensetracker.repository.NotificationRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.*;
@@ -24,6 +25,7 @@ public class NotificationServiceTests {
 
     private final UUID notificationId = UUID.randomUUID();
     private final UUID userId = UUID.randomUUID();
+    private final UUID otherUserId = UUID.randomUUID();
     private final String message = "Test notification";
     private final OffsetDateTime createdAt = OffsetDateTime.now();
 
@@ -54,9 +56,9 @@ public class NotificationServiceTests {
     void saveNotification_ShouldSaveSuccessfully() {
         when(notificationRepository.save(any(Notification.class))).thenReturn(notification);
 
-        final Notification saved = notificationService.saveNotification(createDTO);
+        final NotificationDTO saved = notificationService.createNotification(createDTO);
 
-        assertEquals(notification, saved);
+        assertEquals(notificationDTO, saved);
         verify(notificationRepository, times(1)).save(any(Notification.class));
     }
 
@@ -113,36 +115,59 @@ public class NotificationServiceTests {
 
     @Test
     void markNotificationAsRead_ShouldSetReadTrue_AndSave_WhenNotificationExists() {
-        UUID id = UUID.randomUUID();
-        Notification notification = new Notification();
-        notification.setId(id);
-        notification.setRead(false);
+        Notification testNotification = Notification.builder()
+                .id(notificationId)
+                .userId(userId)
+                .message(message)
+                .read(false)
+                .build();
 
-        when(notificationRepository.findById(id)).thenReturn(Optional.of(notification));
+        when(notificationRepository.findById(notificationId)).thenReturn(Optional.of(testNotification));
 
-        notificationService.markNotificationAsRead(id);
+        notificationService.markNotificationAsRead(notificationId, userId);
 
-        assertTrue(notification.isRead());
-        verify(notificationRepository).findById(id);
-        verify(notificationRepository).save(notification);
+        assertTrue(testNotification.isRead());
+        verify(notificationRepository).findById(notificationId);
+        verify(notificationRepository).save(testNotification);
         verifyNoMoreInteractions(notificationRepository);
     }
 
     @Test
     void markNotificationAsRead_ShouldThrowException_WhenNotificationNotFound() {
-        UUID id = UUID.randomUUID();
-        when(notificationRepository.findById(id)).thenReturn(Optional.empty());
+        when(notificationRepository.findById(notificationId)).thenReturn(Optional.empty());
 
         NotificationNotFound exception = assertThrows(
                 NotificationNotFound.class,
-                () -> notificationService.markNotificationAsRead(id)
+                () -> notificationService.markNotificationAsRead(notificationId, userId)
         );
 
-        assertEquals("Notification with id " + id + " does not exist", exception.getMessage());
+        assertEquals("Notification with id " + notificationId + " does not exist", exception.getMessage());
 
-        verify(notificationRepository).findById(id);
+        verify(notificationRepository).findById(notificationId);
+        verify(notificationRepository, never()).save(any());
+        verifyNoMoreInteractions(notificationRepository);
+    }
+
+    @Test
+    void markNotificationAsRead_ShouldThrowAccessError_WhenUserDoesNotOwnNotification() {
+        Notification testNotification = Notification.builder()
+                .id(notificationId)
+                .userId(otherUserId)
+                .message(message)
+                .read(false)
+                .build();
+
+        when(notificationRepository.findById(notificationId)).thenReturn(Optional.of(testNotification));
+
+        AccessError exception = assertThrows(
+                AccessError.class,
+                () -> notificationService.markNotificationAsRead(notificationId, userId)
+        );
+
+        assertEquals("You do not have access to this notification", exception.getMessage());
+
+        verify(notificationRepository).findById(notificationId);
         verify(notificationRepository, never()).save(any());
         verifyNoMoreInteractions(notificationRepository);
     }
 }
-
