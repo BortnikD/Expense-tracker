@@ -23,7 +23,7 @@ public class Expenses {
     @Column(name = "user_id", nullable = false)
     private UUID userId;
 
-    @Column(name = "category_id", nullable = false)
+    @Column(name = "category_id")
     private UUID categoryId;
 
     @Column(nullable = false)

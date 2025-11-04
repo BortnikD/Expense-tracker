@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
@@ -14,6 +13,5 @@ public class ExpensesUpdateDTO {
     private UUID id;
     private UUID userId;
     private Double amount;
-    private LocalDate date;
     private String description;
 }

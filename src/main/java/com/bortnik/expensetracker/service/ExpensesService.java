@@ -88,7 +88,6 @@ public class ExpensesService {
         }
 
         expenses.setAmount(expensesUpdateDTO.getAmount());
-        expenses.setDate(expensesUpdateDTO.getDate());
         expenses.setDescription(expensesUpdateDTO.getDescription());
         return ExpensesMapper.toDto(expensesRepository.save(expenses));
     }
@@ -96,10 +95,12 @@ public class ExpensesService {
     private void updateBudgetPlans(ExpensesDTO expensesDTO) {
         LocalDate currentMonth = LocalDate.now();
 
-        budgetPlanService.getOptionalBudgetPlanByUserIdAndCategoryIdAndMonth(
-                        expensesDTO.getUserId(), expensesDTO.getCategoryId(), currentMonth)
-                .map(BudgetPlanDTO::getId)
-                .ifPresent(id -> updateBudgetPlan(id, expensesDTO.getAmount(), "Category"));
+        if (expensesDTO.getCategoryId() != null) {
+            budgetPlanService.getOptionalBudgetPlanByUserIdAndCategoryIdAndMonth(
+                            expensesDTO.getUserId(), expensesDTO.getCategoryId(), currentMonth)
+                    .map(BudgetPlanDTO::getId)
+                    .ifPresent(id -> updateBudgetPlan(id, expensesDTO.getAmount(), "Category"));
+        }
 
         budgetPlanService.getOptionalBudgetPlanByUserIdAndMonth(
                         expensesDTO.getUserId(), currentMonth)
