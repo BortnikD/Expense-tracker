@@ -106,11 +106,26 @@ public class BudgetPlanService {
 
     @Transactional
     public BudgetPlanDTO createBudgetPlan(final BudgetPlanCreateDTO budgetPlanCreateDTO) {
-        if (budgetPlanRepository.existsByUserIdAndMonthBetween(
-                budgetPlanCreateDTO.getUserId(), budgetPlanCreateDTO.getMonth(), budgetPlanCreateDTO.getMonth())
-        ) {
-            throw new BudgetPlanAlreadyExists("the budget plan for this month already exists");
+        final LocalDate monthStart = budgetPlanCreateDTO.getMonth().withDayOfMonth(1);
+        final LocalDate monthEnd = budgetPlanCreateDTO.getMonth().withDayOfMonth(
+                budgetPlanCreateDTO.getMonth().lengthOfMonth());
+
+        boolean alreadyExists;
+
+        if (budgetPlanCreateDTO.getCategoryId() == null) {
+            alreadyExists = budgetPlanRepository.existsByUserIdAndCategoryIdIsNullAndMonthBetween(
+                    budgetPlanCreateDTO.getUserId(), monthStart, monthEnd
+            );
+        } else {
+            alreadyExists = budgetPlanRepository.existsByUserIdAndCategoryIdAndMonthBetween(
+                    budgetPlanCreateDTO.getUserId(), budgetPlanCreateDTO.getCategoryId(), monthStart, monthEnd
+            );
         }
+
+        if (alreadyExists) {
+            throw new BudgetPlanAlreadyExists("The budget plan for this month and category already exists");
+        }
+
         return BudgetPlanMapper.toDto(
                 budgetPlanRepository.save(BudgetPlanMapper.toEntity(budgetPlanCreateDTO))
         );
