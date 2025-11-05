@@ -1,24 +1,34 @@
 package com.bortnik.expensetracker.service;
 
+import com.bortnik.expensetracker.dto.budget.BudgetPlanDTO;
 import com.bortnik.expensetracker.dto.notification.NotificationCreateDTO;
 import com.bortnik.expensetracker.dto.notification.NotificationDTO;
+import com.bortnik.expensetracker.entities.ExceededBudgetNotificationLog;
 import com.bortnik.expensetracker.entities.Notification;
 import com.bortnik.expensetracker.exceptions.notification.NotificationNotFound;
 import com.bortnik.expensetracker.exceptions.user.AccessError;
 import com.bortnik.expensetracker.mappers.NotificationMapper;
+import com.bortnik.expensetracker.repository.ExceededBudgetNotificationLogRepository;
 import com.bortnik.expensetracker.repository.NotificationRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class NotificationService {
+
     private final NotificationRepository notificationRepository;
+    private final ExceededBudgetNotificationLogRepository logRepository;
+    private static final DateTimeFormatter YEAR_MONTH_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM");
 
     @Transactional
     public NotificationDTO createNotification(final NotificationCreateDTO notificationCreateDTO) {
@@ -59,4 +69,51 @@ public class NotificationService {
         notification.setRead(true);
         notificationRepository.save(notification);
     }
+
+    @Transactional
+    public void notifyUserAboutExceededLimit(BudgetPlanDTO exceededPlan) {
+
+        String budgetMonthKey = exceededPlan.getMonth().format(YEAR_MONTH_FORMATTER);
+
+        boolean alreadyNotified = logRepository.existsByUserIdAndBudgetMonthAndCategoryId(
+                exceededPlan.getUserId(),
+                budgetMonthKey,
+                exceededPlan.getCategoryId()
+        );
+
+        if (alreadyNotified) {
+            log.trace("Notification for user {} for plan '{}/{}' has already been sent. Skipping.",
+                    exceededPlan.getUserId(), budgetMonthKey, exceededPlan.getCategoryId());
+            return;
+        }
+
+        String message = String.format(
+                "Your budget plan for %s%s has exceeded the limit by %.2f units.",
+                exceededPlan.getMonth().format(YEAR_MONTH_FORMATTER),
+                exceededPlan.getCategoryId() != null
+                        ? " (category ID: " + exceededPlan.getCategoryId() + ")"
+                        : "",
+                exceededPlan.getSpentAmount() - exceededPlan.getLimitAmount()
+        );
+
+        NotificationCreateDTO notificationDto = NotificationCreateDTO.builder()
+                .userId(exceededPlan.getUserId())
+                .message(message)
+                .build();
+
+        createNotification(notificationDto);
+
+        ExceededBudgetNotificationLog logEntry = ExceededBudgetNotificationLog.builder()
+                .userId(exceededPlan.getUserId())
+                .budgetMonth(budgetMonthKey)
+                .categoryId(exceededPlan.getCategoryId())
+                .notifiedAt(OffsetDateTime.now())
+                .build();
+
+        logRepository.save(logEntry);
+
+        log.info("Notification created for user {} for the budget of {}", exceededPlan.getUserId(), budgetMonthKey);
+        // TODO: реализовать отправку сообщений по вебсокетам
+    }
+
 }

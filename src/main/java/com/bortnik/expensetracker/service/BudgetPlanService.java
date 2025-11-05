@@ -83,6 +83,14 @@ public class BudgetPlanService {
                 .toList();
     }
 
+    public Page<BudgetPlanDTO> getAllBySpentAmountExceedsLimit(Pageable pageable) {
+        LocalDate now = LocalDate.now();
+        LocalDate startMonth = now.withDayOfMonth(1);
+        LocalDate endMonth = now.withDayOfMonth(now.lengthOfMonth());
+        return budgetPlanRepository.findAllBySpentAmountExceedsLimitAndMonthBetween(pageable, startMonth, endMonth)
+                .map(BudgetPlanMapper::toDto);
+    }
+
     public List<BudgetPlanDTO> getBudgetPlansByUserIdAndMonth(final UUID userId, final LocalDate month) {
         LocalDate startMonth = month.withDayOfMonth(1);
         LocalDate endMonth = month.withDayOfMonth(month.lengthOfMonth());

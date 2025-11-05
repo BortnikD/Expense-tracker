@@ -33,6 +33,13 @@ public interface BudgetPlanRepository extends JpaRepository<BudgetPlan, UUID> {
 """)
     List<BudgetPlan> findByUserIdAndSpentAmountExceedsLimit(UUID userId);
 
+    @Query("""
+    SELECT b FROM BudgetPlan b
+    WHERE b.spentAmount > b.limitAmount
+    AND b.month BETWEEN :startMonth AND :endMonth
+""")
+    Page<BudgetPlan> findAllBySpentAmountExceedsLimitAndMonthBetween(Pageable pageable, LocalDate startMonth, LocalDate endMonth);
+
     List<BudgetPlan> findByUserIdAndMonthBetween(
             UUID userId,
             LocalDate startMonth,
