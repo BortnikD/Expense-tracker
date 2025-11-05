@@ -1,10 +1,8 @@
 package com.bortnik.expensetracker.controller;
 
-import com.bortnik.expensetracker.dto.notification.NotificationCreateDTO;
 import com.bortnik.expensetracker.dto.notification.NotificationDTO;
 import com.bortnik.expensetracker.service.NotificationService;
 import com.bortnik.expensetracker.service.UserService;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
@@ -25,18 +23,6 @@ public class NotificationController {
 
     private final NotificationService notificationService;
     private final UserService userService;
-
-    /** WARNING
-     * Only for tests. Delete it in production
-     */
-//    @PostMapping
-//    public NotificationDTO createNotification(
-//            @Valid
-//            @RequestBody
-//            NotificationCreateDTO notificationCreateDTO
-//    ) {
-//        return notificationService.createNotification(notificationCreateDTO);
-//    }
 
     @GetMapping("/all")
     public Page<NotificationDTO> getNotifications(

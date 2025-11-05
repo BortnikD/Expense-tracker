@@ -18,7 +18,7 @@ public class ExpenseReportScheduler {
     private final BudgetPlanService budgetPlanService;
     private final NotificationService notificationService;
 
-    @Scheduled(cron = "0 0 9 * * *")
+    @Scheduled(cron = "0 * * * * *")
     public void sendNotification() {
         int page = 0;
         final int pageSize = 200;

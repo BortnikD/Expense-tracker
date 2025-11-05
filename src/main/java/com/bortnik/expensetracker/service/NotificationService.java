@@ -28,6 +28,7 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final ExceededBudgetNotificationLogRepository logRepository;
+    private final WebSocketNotificationService webSocketNotificationService;
     private static final DateTimeFormatter YEAR_MONTH_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM");
 
     @Transactional
@@ -73,9 +74,9 @@ public class NotificationService {
     @Transactional
     public void notifyUserAboutExceededLimit(BudgetPlanDTO exceededPlan) {
 
-        String budgetMonthKey = exceededPlan.getMonth().format(YEAR_MONTH_FORMATTER);
+        final String budgetMonthKey = exceededPlan.getMonth().format(YEAR_MONTH_FORMATTER);
 
-        boolean alreadyNotified = logRepository.existsByUserIdAndBudgetMonthAndCategoryId(
+        final boolean alreadyNotified = logRepository.existsByUserIdAndBudgetMonthAndCategoryId(
                 exceededPlan.getUserId(),
                 budgetMonthKey,
                 exceededPlan.getCategoryId()
@@ -87,7 +88,7 @@ public class NotificationService {
             return;
         }
 
-        String message = String.format(
+        final String message = String.format(
                 "Your budget plan for %s%s has exceeded the limit by %.2f units.",
                 exceededPlan.getMonth().format(YEAR_MONTH_FORMATTER),
                 exceededPlan.getCategoryId() != null
@@ -101,9 +102,9 @@ public class NotificationService {
                 .message(message)
                 .build();
 
-        createNotification(notificationDto);
+        final NotificationDTO notification = createNotification(notificationDto);
 
-        ExceededBudgetNotificationLog logEntry = ExceededBudgetNotificationLog.builder()
+        final ExceededBudgetNotificationLog logEntry = ExceededBudgetNotificationLog.builder()
                 .userId(exceededPlan.getUserId())
                 .budgetMonth(budgetMonthKey)
                 .categoryId(exceededPlan.getCategoryId())
@@ -113,7 +114,8 @@ public class NotificationService {
         logRepository.save(logEntry);
 
         log.info("Notification created for user {} for the budget of {}", exceededPlan.getUserId(), budgetMonthKey);
-        // TODO: реализовать отправку сообщений по вебсокетам
+
+        webSocketNotificationService.sendNotificationToUser(notification);
     }
 
 }
