@@ -16,6 +16,7 @@ import jakarta.validation.ConstraintViolationException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -170,7 +171,7 @@ public class ExceptionsHandler {
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    ResponseEntity<ApiError> handleException(ConstraintViolationException exception) {
+    ResponseEntity<ApiError> handleConstraintViolationException(ConstraintViolationException exception) {
         return buildResponseEntity(
                 ApiError.builder()
                         .timestamp(LocalDateTime.now())
@@ -182,11 +183,23 @@ public class ExceptionsHandler {
     }
 
     @ExceptionHandler(BadRequest.class)
-    ResponseEntity<ApiError> handleException(BadRequest exception) {
+    ResponseEntity<ApiError> handleBadRequest(BadRequest exception) {
         return buildResponseEntity(
                 ApiError.builder()
                         .timestamp(LocalDateTime.now())
                         .error("Bad Request")
+                        .message(exception.getMessage())
+                        .status(HttpStatus.BAD_REQUEST)
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    ResponseEntity<ApiError> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException exception) {
+        return buildResponseEntity(
+                ApiError.builder()
+                        .timestamp(LocalDateTime.now())
+                        .error("Method Argument Type Mismatch Exception")
                         .message(exception.getMessage())
                         .status(HttpStatus.BAD_REQUEST)
                         .build()
