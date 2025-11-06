@@ -32,4 +32,9 @@ public class ExpenseReportScheduler {
 
         log.info("Sending expense reports is completed");
     }
+
+    @Scheduled(cron = "0 0 0 1 * *")
+    public void deleteNotActualNotifications() {
+        notificationService.deleteNotActualNotifications();
+    }
 }

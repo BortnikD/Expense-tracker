@@ -30,6 +30,7 @@ public class NotificationService {
     private final ExceededBudgetNotificationLogRepository logRepository;
     private final WebSocketNotificationService webSocketNotificationService;
     private static final DateTimeFormatter YEAR_MONTH_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM");
+    private final ExceededBudgetNotificationLogRepository exceededBudgetNotificationLogRepository;
 
     @Transactional
     public NotificationDTO createNotification(final NotificationCreateDTO notificationCreateDTO) {
@@ -118,4 +119,10 @@ public class NotificationService {
         webSocketNotificationService.sendNotificationToUser(notification);
     }
 
+    @Transactional
+    public void deleteNotActualNotifications() {
+        OffsetDateTime startMonth = OffsetDateTime.now().withDayOfMonth(1);
+        exceededBudgetNotificationLogRepository.deleteAllByNotifiedAtBefore(startMonth);
+        log.info("Notifications before date {} were deleted", startMonth);
+    }
 }
