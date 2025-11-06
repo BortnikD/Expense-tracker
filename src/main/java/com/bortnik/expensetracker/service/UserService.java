@@ -8,6 +8,7 @@ import com.bortnik.expensetracker.mappers.UserMapper;
 import com.bortnik.expensetracker.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -28,6 +29,7 @@ public class UserService {
         return UserMapper.toDto(userRepository.save(UserMapper.toEntity(user)));
     }
 
+    @Cacheable(value = "usersById", key = "#id")
     public UserDTO getUserById(UUID id) {
         return UserMapper.toDto(
                 userRepository.findById(id)
@@ -35,6 +37,7 @@ public class UserService {
         );
     }
 
+    @Cacheable(value = "usersByUsername", key = "#username")
     public UserDTO getUserByUsername(String username) {
         return UserMapper.toDto(
                 userRepository.findByUsername(username)
@@ -42,22 +45,11 @@ public class UserService {
         );
     }
 
+    @Cacheable(value = "usersByEmail", key = "#email")
     public UserDTO getUserByEmail(String email) {
         return UserMapper.toDto(
                 userRepository.findByEmail(email)
                         .orElseThrow(() -> new UserNotFound("User with email = " + email + " does not exist"))
         );
-    }
-
-    public boolean existsUserById(UUID id) {
-        return userRepository.existsById(id);
-    }
-
-    public boolean existsUserByUsername(String username) {
-        return userRepository.existsByUsername(username);
-    }
-
-    public boolean existsUserByEmail(String email) {
-        return userRepository.existsByEmail(email);
     }
 }
