@@ -58,6 +58,9 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.mockk:mockk:1.13.9")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    // reporting
+    implementation("org.apache.poi:poi-ooxml:5.4.1")
 }
 
 tasks.withType<Test> {
