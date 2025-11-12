@@ -11,6 +11,7 @@ import com.bortnik.expensetracker.mappers.CategoryMapper;
 import com.bortnik.expensetracker.repository.CategoryRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -51,5 +52,15 @@ public class CategoryService {
                 .stream()
                 .map(CategoryMapper::toDto)
                 .toList();
+    }
+
+    @Cacheable(value = "categoryById", key = "#categoryId")
+    public CategoryDTO getCategory(UUID categoryId) {
+        return CategoryMapper.toDto(
+                categoryRepository.findById(categoryId)
+                        .orElseThrow(() ->
+                                new CategoryNotFound("Category with id " + categoryId + " does not exist")
+                        )
+        );
     }
 }

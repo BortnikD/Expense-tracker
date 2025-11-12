@@ -28,7 +28,7 @@ public class ReportController {
             @RequestParam LocalDate month
     ) {
         UUID userId = userService.getUserByUsername(userDetails.getUsername()).getId();
-        byte[] reportData = budgetReportService.generateReport(userId, month);
+        byte[] reportData = budgetReportService.generateBudgetReport(userId, month);
         String contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         String filename = "budget_report_" + month.getMonth() + "_" + month.getYear() + ".xlsx";
 
@@ -36,5 +36,24 @@ public class ReportController {
                 .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
                 .header("Content-Type", contentType)
                 .body(reportData);
+    }
+
+    @GetMapping("/expenses/excel")
+    public ResponseEntity<byte[]> getExpensesReportExcel(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam LocalDate startMonth,
+            @RequestParam LocalDate endMonth
+    ) {
+        UUID userId = userService.getUserByUsername(userDetails.getUsername()).getId();
+        byte[] reportData = budgetReportService.generateExpensesReport(userId, startMonth, endMonth);
+        String contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+        String filename = "expenses_report_" + startMonth.getMonth() + "_" + startMonth.getYear() +
+                "_to_" + endMonth.getMonth() + "_" + endMonth.getYear() + ".xlsx";
+
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
+                .header("Content-Type", contentType)
+                .body(reportData);
+
     }
 }

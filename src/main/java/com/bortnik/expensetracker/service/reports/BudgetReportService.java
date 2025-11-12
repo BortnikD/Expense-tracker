@@ -1,7 +1,9 @@
 package com.bortnik.expensetracker.service.reports;
 
 import com.bortnik.expensetracker.dto.budget.BudgetPlanDTO;
+import com.bortnik.expensetracker.dto.expenses.ExpensesDTO;
 import com.bortnik.expensetracker.service.BudgetPlanService;
+import com.bortnik.expensetracker.service.ExpensesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,9 +17,19 @@ public class BudgetReportService {
 
     private final ExcelReportGenerator excelReportGenerator;
     private final BudgetPlanService budgetPlanService;
+    private final ExpensesService expensesService;
 
-    public byte[] generateReport(UUID userId, LocalDate month) {
+    public byte[] generateBudgetReport(UUID userId, LocalDate month) {
         List<BudgetPlanDTO> budgetPlans = budgetPlanService.getBudgetPlansByUserIdAndMonth(userId, month);
-        return excelReportGenerator.generateReport(budgetPlans);
+        return excelReportGenerator.generateBudgetReport(budgetPlans);
+    }
+
+    public byte[] generateExpensesReport(
+            UUID userId,
+            LocalDate startMonth,
+            LocalDate endMonth
+    ) {
+        List<ExpensesDTO> expenses = expensesService.getExpensesBetweenDates(userId, startMonth, endMonth);
+        return excelReportGenerator.generateExpenseReport(expenses);
     }
 }
