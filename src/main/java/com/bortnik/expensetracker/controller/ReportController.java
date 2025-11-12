@@ -22,6 +22,8 @@ public class ReportController {
     private final BudgetReportService budgetReportService;
     private final UserService userService;
 
+    private static final String EXCEL_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
     @GetMapping("/budget/excel")
     public ResponseEntity<byte[]> getBudgetReportExcel(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -29,12 +31,11 @@ public class ReportController {
     ) {
         UUID userId = userService.getUserByUsername(userDetails.getUsername()).getId();
         byte[] reportData = budgetReportService.generateBudgetReport(userId, month);
-        String contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         String filename = "budget_report_" + month.getMonth() + "_" + month.getYear() + ".xlsx";
 
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
-                .header("Content-Type", contentType)
+                .header("Content-Type", EXCEL_CONTENT_TYPE)
                 .body(reportData);
     }
 
@@ -46,13 +47,12 @@ public class ReportController {
     ) {
         UUID userId = userService.getUserByUsername(userDetails.getUsername()).getId();
         byte[] reportData = budgetReportService.generateExpensesReport(userId, startMonth, endMonth);
-        String contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         String filename = "expenses_report_" + startMonth.getMonth() + "_" + startMonth.getYear() +
                 "_to_" + endMonth.getMonth() + "_" + endMonth.getYear() + ".xlsx";
 
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
-                .header("Content-Type", contentType)
+                .header("Content-Type", EXCEL_CONTENT_TYPE)
                 .body(reportData);
 
     }
