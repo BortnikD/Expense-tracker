@@ -4,7 +4,7 @@ import com.bortnik.expensetracker.dto.user.UserRegister;
 import com.bortnik.expensetracker.dto.user.UserDTO;
 import com.bortnik.expensetracker.exceptions.user.UserNotFound;
 import com.bortnik.expensetracker.exceptions.user.UserAlreadyExists;
-import com.bortnik.expensetracker.mappers.UserMapper;
+import com.bortnik.expensetracker.util.mappers.UserMapper;
 import com.bortnik.expensetracker.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

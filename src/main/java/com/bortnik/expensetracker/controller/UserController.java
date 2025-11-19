@@ -1,7 +1,9 @@
 package com.bortnik.expensetracker.controller;
 
+import com.bortnik.expensetracker.dto.ApiResponse;
 import com.bortnik.expensetracker.dto.user.UserDTO;
 import com.bortnik.expensetracker.service.UserService;
+import com.bortnik.expensetracker.util.ApiResponseFactory;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
@@ -21,30 +23,34 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/{id}")
-    public UserDTO getUserById(@PathVariable UUID id) {
-        return userService.getUserById(id);
+    public ApiResponse<UserDTO> getUserById(@PathVariable UUID id) {
+        UserDTO user = userService.getUserById(id);
+        return ApiResponseFactory.success(user);
     }
 
     @GetMapping("/by-username")
-    public UserDTO getUserByUsername(
+    public ApiResponse<UserDTO> getUserByUsername(
             @Size(min = 3, max = 255, message = "Username must be between 3 and 255 characters")
             @RequestParam
             String username
     ) {
-        return userService.getUserByUsername(username);
+        UserDTO user = userService.getUserByUsername(username);
+        return ApiResponseFactory.success(user);
     }
 
     @GetMapping("/by-email")
-    public UserDTO getUserByEmail(
+    public ApiResponse<UserDTO> getUserByEmail(
             @Email(message = "Email is invalid")
             @RequestParam
             String email
     ) {
-        return userService.getUserByEmail(email);
+        UserDTO user = userService.getUserByEmail(email);
+        return ApiResponseFactory.success(user);
     }
 
     @GetMapping("/who-am-i")
-    public UserDTO getWhoAmI(@AuthenticationPrincipal UserDetails user ) {
-        return userService.getUserByUsername(user.getUsername());
+    public ApiResponse<UserDTO> getWhoAmI(@AuthenticationPrincipal UserDetails user) {
+        UserDTO userDTO = userService.getUserByUsername(user.getUsername());
+        return ApiResponseFactory.success(userDTO);
     }
 }

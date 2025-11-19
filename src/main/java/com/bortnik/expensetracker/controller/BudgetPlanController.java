@@ -1,9 +1,11 @@
 package com.bortnik.expensetracker.controller;
 
+import com.bortnik.expensetracker.dto.ApiResponse;
 import com.bortnik.expensetracker.dto.budget.*;
 import com.bortnik.expensetracker.exceptions.BadRequest;
 import com.bortnik.expensetracker.service.BudgetPlanService;
 import com.bortnik.expensetracker.service.UserService;
+import com.bortnik.expensetracker.util.ApiResponseFactory;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,39 +29,39 @@ public class BudgetPlanController {
     private final UserService userService;
 
     @GetMapping
-    public BudgetPlanDTO getBudgetPlanByUserIdAndCategoryIdAndMonth(
+    public ApiResponse<BudgetPlanDTO> getBudgetPlanByUserIdAndCategoryIdAndMonth(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam(required = false) UUID categoryId,
             @RequestParam LocalDate month
     ) {
         UUID userId = userService.getUserByUsername(userDetails.getUsername()).getId();
-        if (categoryId != null) {
-            return budgetPlanService.getBudgetPlanByUserIdAndCategoryIdAndMonth(userId, categoryId, month);
-        }
-        else {
-            return budgetPlanService.getBudgetPlanByUserIdAndMonth(userId, month);
-        }
+        BudgetPlanDTO budgetPlanDTO = categoryId != null
+                ? budgetPlanService.getBudgetPlanByUserIdAndCategoryIdAndMonth(userId, categoryId, month)
+                : budgetPlanService.getBudgetPlanByUserIdAndMonth(userId, month);
+        return ApiResponseFactory.success(budgetPlanDTO);
     }
 
     @GetMapping("/exceeding")
-    public List<BudgetPlanDTO> getExceedingBudgetPlans(
+    public ApiResponse<List<BudgetPlanDTO>> getExceedingBudgetPlans(
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         UUID userId = userService.getUserByUsername(userDetails.getUsername()).getId();
-        return budgetPlanService.getExceedingBudgetPlans(userId);
+        List<BudgetPlanDTO> budgetPlans = budgetPlanService.getExceedingBudgetPlans(userId);
+        return ApiResponseFactory.success(budgetPlans);
     }
 
     @GetMapping("/all-in-month")
-    public List<BudgetPlanDTO> getBudgetPlansByUserIdAndMonth(
+    public ApiResponse<List<BudgetPlanDTO>> getBudgetPlansByUserIdAndMonth(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam LocalDate month
     ) {
         UUID userId = userService.getUserByUsername(userDetails.getUsername()).getId();
-        return budgetPlanService.getBudgetPlansByUserIdAndMonth(userId, month);
+        List<BudgetPlanDTO> budgetPlans = budgetPlanService.getBudgetPlansByUserIdAndMonth(userId, month);
+        return ApiResponseFactory.success(budgetPlans);
     }
 
     @GetMapping("/all")
-    public Page<BudgetPlanDTO> getAllBudgetPlans(
+    public ApiResponse<Page<BudgetPlanDTO>> getAllBudgetPlans(
             @AuthenticationPrincipal UserDetails userDetails,
             @PositiveOrZero(message = "page must be positive or zero")
             @RequestParam int page,
@@ -68,16 +70,17 @@ public class BudgetPlanController {
     ) {
         UUID userId = userService.getUserByUsername(userDetails.getUsername()).getId();
         Pageable pageable = Pageable.ofSize(pageSize).withPage(page);
-        return budgetPlanService.getAllBudgetPlans(userId, pageable);
+        Page<BudgetPlanDTO> budgetPlans = budgetPlanService.getAllBudgetPlans(userId, pageable);
+        return ApiResponseFactory.success(budgetPlans);
     }
 
     @PostMapping
-    public BudgetPlanDTO createBudgetPlan(
+    public ApiResponse<BudgetPlanDTO> createBudgetPlan(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody BudgetPlanCreateRequestDTO budgetPlanCreateRequestDTO
     ) {
         validateDate(budgetPlanCreateRequestDTO.getMonth());
-        return budgetPlanService.createBudgetPlan(
+        BudgetPlanDTO budgetPlan = budgetPlanService.createBudgetPlan(
                 BudgetPlanCreateDTO.builder()
                         .userId(userService.getUserByUsername(userDetails.getUsername()).getId())
                         .categoryId(budgetPlanCreateRequestDTO.getCategoryId())
@@ -86,29 +89,32 @@ public class BudgetPlanController {
                         .month(budgetPlanCreateRequestDTO.getMonth())
                         .build()
         );
+        return ApiResponseFactory.success(budgetPlan);
     }
 
     @PatchMapping
-    public BudgetPlanDTO updateBudgetPlanLimit(
+    public ApiResponse<BudgetPlanDTO> updateBudgetPlanLimit(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody BudgetPlanUpdateRequestDTO budgetPlanUpdateRequestDTO
     ) {
-        return budgetPlanService.updateBudgetPlan(
+        BudgetPlanDTO budgetPlan = budgetPlanService.updateBudgetPlan(
                 BudgetPlanUpdateDTO.builder()
                         .id(budgetPlanUpdateRequestDTO.getId())
                         .userId(userService.getUserByUsername(userDetails.getUsername()).getId())
                         .limitAmount(budgetPlanUpdateRequestDTO.getLimitAmount())
                         .build()
         );
+        return ApiResponseFactory.success(budgetPlan);
     }
 
     @DeleteMapping("/{id}")
-    public BudgetPlanDTO deleteBudgetPlan(
+    public ApiResponse<BudgetPlanDTO> deleteBudgetPlan(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable UUID id
     ) {
         UUID userId = userService.getUserByUsername(userDetails.getUsername()).getId();
-        return budgetPlanService.deleteBudgetPlan(id, userId);
+        BudgetPlanDTO budgetPlan = budgetPlanService.deleteBudgetPlan(id, userId);
+        return ApiResponseFactory.success(budgetPlan);
     }
 
     private void validateDate(LocalDate date) {

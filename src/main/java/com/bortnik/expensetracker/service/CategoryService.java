@@ -7,7 +7,7 @@ import com.bortnik.expensetracker.entities.Category;
 import com.bortnik.expensetracker.exceptions.category.CategoryAlreadyExists;
 import com.bortnik.expensetracker.exceptions.category.CategoryNotFound;
 import com.bortnik.expensetracker.exceptions.user.AccessError;
-import com.bortnik.expensetracker.mappers.CategoryMapper;
+import com.bortnik.expensetracker.util.mappers.CategoryMapper;
 import com.bortnik.expensetracker.repository.CategoryRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

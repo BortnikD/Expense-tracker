@@ -1,9 +1,11 @@
 package com.bortnik.expensetracker.controller;
 
+import com.bortnik.expensetracker.dto.ApiResponse;
 import com.bortnik.expensetracker.dto.AuthResponse;
 import com.bortnik.expensetracker.dto.user.UserRegister;
 import com.bortnik.expensetracker.dto.user.UserLogin;
 import com.bortnik.expensetracker.service.AuthenticationService;
+import com.bortnik.expensetracker.util.ApiResponseFactory;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -20,12 +22,14 @@ class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @PostMapping("/register")
-    public AuthResponse registerUser(@Valid @RequestBody UserRegister userCreateDTO) {
-        return authenticationService.register(userCreateDTO);
+    public ApiResponse<AuthResponse> registerUser(@Valid @RequestBody UserRegister userCreateDTO) {
+        final AuthResponse authResponse = authenticationService.register(userCreateDTO);
+        return ApiResponseFactory.success(authResponse);
     }
 
     @PostMapping("/login")
-    public AuthResponse loginUser(@Valid @RequestBody UserLogin userLogin) {
-        return authenticationService.login(userLogin);
+    public ApiResponse<AuthResponse> loginUser(@Valid @RequestBody UserLogin userLogin) {
+        final AuthResponse authResponse = authenticationService.login(userLogin);
+        return ApiResponseFactory.success(authResponse);
     }
 }

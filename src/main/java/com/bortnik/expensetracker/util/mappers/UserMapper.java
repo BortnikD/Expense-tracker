@@ -1,4 +1,4 @@
-package com.bortnik.expensetracker.mappers;
+package com.bortnik.expensetracker.util.mappers;
 
 import com.bortnik.expensetracker.dto.user.UserRegister;
 import com.bortnik.expensetracker.dto.user.UserDTO;

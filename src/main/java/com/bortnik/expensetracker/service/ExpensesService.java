@@ -8,7 +8,7 @@ import com.bortnik.expensetracker.dto.expenses.ExpensesUpdateDTO;
 import com.bortnik.expensetracker.entities.Expenses;
 import com.bortnik.expensetracker.exceptions.expenses.ExpensesNotFound;
 import com.bortnik.expensetracker.exceptions.user.AccessError;
-import com.bortnik.expensetracker.mappers.ExpensesMapper;
+import com.bortnik.expensetracker.util.mappers.ExpensesMapper;
 import com.bortnik.expensetracker.repository.ExpensesRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

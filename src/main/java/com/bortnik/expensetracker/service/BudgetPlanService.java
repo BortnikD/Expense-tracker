@@ -8,7 +8,7 @@ import com.bortnik.expensetracker.entities.BudgetPlan;
 import com.bortnik.expensetracker.exceptions.budget.BudgetPlanNotFound;
 import com.bortnik.expensetracker.exceptions.budget.BudgetPlanAlreadyExists;
 import com.bortnik.expensetracker.exceptions.user.AccessError;
-import com.bortnik.expensetracker.mappers.BudgetPlanMapper;
+import com.bortnik.expensetracker.util.mappers.BudgetPlanMapper;
 import com.bortnik.expensetracker.repository.BudgetPlanRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

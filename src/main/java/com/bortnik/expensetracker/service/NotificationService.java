@@ -7,7 +7,7 @@ import com.bortnik.expensetracker.entities.ExceededBudgetNotificationLog;
 import com.bortnik.expensetracker.entities.Notification;
 import com.bortnik.expensetracker.exceptions.notification.NotificationNotFound;
 import com.bortnik.expensetracker.exceptions.user.AccessError;
-import com.bortnik.expensetracker.mappers.NotificationMapper;
+import com.bortnik.expensetracker.util.mappers.NotificationMapper;
 import com.bortnik.expensetracker.repository.ExceededBudgetNotificationLogRepository;
 import com.bortnik.expensetracker.repository.NotificationRepository;
 import jakarta.transaction.Transactional;

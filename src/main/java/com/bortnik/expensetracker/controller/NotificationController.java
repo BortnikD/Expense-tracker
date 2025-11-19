@@ -1,8 +1,10 @@
 package com.bortnik.expensetracker.controller;
 
+import com.bortnik.expensetracker.dto.ApiResponse;
 import com.bortnik.expensetracker.dto.notification.NotificationDTO;
 import com.bortnik.expensetracker.service.NotificationService;
 import com.bortnik.expensetracker.service.UserService;
+import com.bortnik.expensetracker.util.ApiResponseFactory;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
@@ -25,38 +27,41 @@ public class NotificationController {
     private final UserService userService;
 
     @GetMapping("/all")
-    public Page<NotificationDTO> getNotifications(
+    public ApiResponse<Page<NotificationDTO>> getNotifications(
             @AuthenticationPrincipal UserDetails user,
-            @PositiveOrZero(message = "page must be positive or zero" )
+            @PositiveOrZero(message = "page must be positive or zero")
             @RequestParam int page,
-            @Positive(message = "page size must be positive" )
+            @Positive(message = "page size must be positive")
             @RequestParam int pageSize
     ) {
         UUID userId = userService.getUserByUsername(user.getUsername()).getId();
         Pageable pageable = Pageable.ofSize(pageSize).withPage(page);
-        return notificationService.getNotifications(userId, pageable);
+        Page<NotificationDTO> notifications = notificationService.getNotifications(userId, pageable);
+        return ApiResponseFactory.success(notifications);
     }
 
     @GetMapping("/by-read-status")
-    public Page<NotificationDTO> getNotificationsByRead(
+    public ApiResponse<Page<NotificationDTO>> getNotificationsByRead(
             @AuthenticationPrincipal UserDetails user,
             @RequestParam boolean isRead,
-            @PositiveOrZero(message = "page must be positive or zero" )
+            @PositiveOrZero(message = "page must be positive or zero")
             @RequestParam int page,
-            @Positive(message = "page size must be positive" )
+            @Positive(message = "page size must be positive")
             @RequestParam int pageSize
     ) {
         UUID userId = userService.getUserByUsername(user.getUsername()).getId();
         Pageable pageable = Pageable.ofSize(pageSize).withPage(page);
-        return notificationService.getNotificationsByRead(userId, isRead, pageable);
+        Page<NotificationDTO> notifications = notificationService.getNotificationsByRead(userId, isRead, pageable);
+        return ApiResponseFactory.success(notifications);
     }
 
     @PatchMapping("/{notificationId}/mark-as-read")
-    public void markNotificationAsRead(
+    public ApiResponse<Void> markNotificationAsRead(
             @AuthenticationPrincipal UserDetails user,
             @PathVariable UUID notificationId
     ) {
         UUID userId = userService.getUserByUsername(user.getUsername()).getId();
         notificationService.markNotificationAsRead(notificationId, userId);
+        return ApiResponseFactory.success(null);
     }
 }
