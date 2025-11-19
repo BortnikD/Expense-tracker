@@ -1,8 +1,8 @@
 package com.bortnik.expensetracker.service.reports;
 
 import com.bortnik.expensetracker.dto.budget.BudgetPlanDTO;
+import com.bortnik.expensetracker.dto.budget.BudgetRowData;
 import com.bortnik.expensetracker.dto.expenses.ExpensesDTO;
-import com.bortnik.expensetracker.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
@@ -11,22 +11,17 @@ import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.UUID;
+
+import static com.bortnik.expensetracker.service.reports.BaseReportGenerator.BUDGET_HEADERS;
+import static com.bortnik.expensetracker.service.reports.BaseReportGenerator.EXPENSE_HEADERS;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class ExcelReportGenerator {
 
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-    private static final String[] BUDGET_HEADERS = {"Month", "Category", "Limit", "Spent", "Remaining", "%"};
-    private static final String[] EXPENSE_HEADERS = {"Date", "Category", "Amount", "Description"};
-    private static final String WITHOUT_CATEGORY = "Without category";
-
-    private final CategoryService categoryService;
+    private final BaseReportGenerator  baseReportGenerator;
 
     public byte[] generateBudgetReport(List<BudgetPlanDTO> budgetPlans) {
         log.info("Starting budget report generation for {} plans", budgetPlans.size());
@@ -42,7 +37,7 @@ public class ExcelReportGenerator {
 
         } catch (Exception e) {
             log.error("Error generating budget report", e);
-            return new byte[0];
+            throw new RuntimeException("Failed to generate Excel budget report", e);
         }
     }
 
@@ -61,7 +56,7 @@ public class ExcelReportGenerator {
 
         } catch (Exception e) {
             log.error("Error generating expense report", e);
-            return new byte[0];
+            throw new RuntimeException("Failed to generate Excel expense report", e);
         }
     }
 
@@ -81,15 +76,15 @@ public class ExcelReportGenerator {
 
         for (BudgetPlanDTO plan : budgetPlans) {
             Row row = sheet.createRow(rowNum++);
-            BudgetRowData data = calculateBudgetData(plan);
+            BudgetRowData data = baseReportGenerator.calculateBudgetData(plan);
 
-            row.createCell(0).setCellValue(formatMonth(plan.getMonth()));
-            row.createCell(1).setCellValue(getCategoryName(plan.getCategoryId()));
-            row.createCell(2).setCellValue(data.limit);
+            row.createCell(0).setCellValue(baseReportGenerator.formatMonth(plan.getMonth()));
+            row.createCell(1).setCellValue(baseReportGenerator.getCategoryName(plan.getCategoryId()));
+            row.createCell(2).setCellValue(data.limit());
 
-            createStyledCell(row, 3, data.spent, createColoredStyle(workbook, data.isOverBudget));
-            createStyledCell(row, 4, data.remaining, createColoredStyle(workbook, data.isOverBudget));
-            createStyledCell(row, 5, data.percentageDecimal, createPercentageStyle(workbook, data.isOverBudget));
+            createStyledCell(row, 3, data.spent(), createColoredStyle(workbook, data.isOverBudget()));
+            createStyledCell(row, 4, data.remaining(), createColoredStyle(workbook, data.isOverBudget()));
+            createStyledCell(row, 5, data.percentageDecimal(), createPercentageStyle(workbook, data.isOverBudget()));
         }
     }
 
@@ -99,8 +94,8 @@ public class ExcelReportGenerator {
         for (ExpensesDTO expense : expenses) {
             Row row = sheet.createRow(rowNum++);
 
-            row.createCell(0).setCellValue(formatDate(expense.getDate()));
-            row.createCell(1).setCellValue(getCategoryName(expense.getCategoryId()));
+            row.createCell(0).setCellValue(baseReportGenerator.formatDate(expense.getDate()));
+            row.createCell(1).setCellValue(baseReportGenerator.getCategoryName(expense.getCategoryId()));
             row.createCell(2).setCellValue(expense.getAmount());
             row.createCell(3).setCellValue(expense.getDescription());
         }
@@ -121,31 +116,6 @@ public class ExcelReportGenerator {
         Cell cell = row.createCell(column);
         cell.setCellValue(value);
         cell.setCellStyle(style);
-    }
-
-    private BudgetRowData calculateBudgetData(BudgetPlanDTO plan) {
-        double limit = plan.getLimitAmount();
-        double spent = plan.getSpentAmount();
-        double remaining = limit - spent;
-        double percentage = limit > 0 ? (spent / limit) * 100 : 0;
-        boolean isOverBudget = spent > limit;
-
-        return new BudgetRowData(limit, spent, remaining, percentage / 100, isOverBudget);
-    }
-
-    private String getCategoryName(UUID categoryId) {
-        if (categoryId == null) {
-            return WITHOUT_CATEGORY;
-        }
-        return categoryService.getCategory(categoryId).getName();
-    }
-
-    private String formatMonth(LocalDate month) {
-        return month.getMonth().toString() + " " + month.getYear();
-    }
-
-    private String formatDate(LocalDate date) {
-        return date.format(DATE_FORMATTER);
     }
 
     private void autoSizeColumns(Sheet sheet, int columnCount) {
@@ -226,12 +196,4 @@ public class ExcelReportGenerator {
         style.setBorderLeft(BorderStyle.THIN);
         style.setBorderRight(BorderStyle.THIN);
     }
-
-    private record BudgetRowData(
-            double limit,
-            double spent,
-            double remaining,
-            double percentageDecimal,
-            boolean isOverBudget
-    ) {}
 }

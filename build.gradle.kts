@@ -61,7 +61,7 @@ dependencies {
 
     // reporting
     implementation("org.apache.poi:poi-ooxml:5.4.1")
-}
+    implementation("com.itextpdf:itext7-core:9.3.0")}
 
 tasks.withType<Test> {
     useJUnitPlatform()
