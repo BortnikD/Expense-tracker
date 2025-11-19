@@ -1,15 +1,12 @@
 package com.bortnik.expensetracker.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.UUID;
 
-@Data
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -23,18 +20,32 @@ public class BudgetPlan {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "user_id")
     private UUID userId;
 
     @Column(name = "category_id")
     private UUID categoryId;
 
-    @Column(name = "limit_amount", nullable = false)
+    @Setter
+    @Column(name = "limit_amount")
     private Double limitAmount;
 
-    @Column(name = "spent_amount", nullable = false)
+    @Setter
+    @Column(name = "spent_amount")
     private Double spentAmount;
 
-    @Column(nullable = false)
+    @Column
     private LocalDate month;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BudgetPlan that)) return false;
+        return id != null && id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

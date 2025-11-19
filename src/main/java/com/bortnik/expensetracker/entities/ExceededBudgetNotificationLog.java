@@ -1,14 +1,12 @@
 package com.bortnik.expensetracker.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-@Data
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,15 +19,28 @@ public class ExceededBudgetNotificationLog {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "user_id")
     private UUID userId;
 
-    @Column(name = "budget_month", nullable = false)
+    @Column(name = "budget_month")
     private String budgetMonth; // e.g., "2025-11"
 
     @Column(name = "category_id") // Can be null
     private UUID categoryId;
 
-    @Column(name = "notified_at", nullable = false)
+    @Setter
+    @Column(name = "notified_at")
     private OffsetDateTime notifiedAt;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ExceededBudgetNotificationLog that)) return false;
+        return id != null && id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }
