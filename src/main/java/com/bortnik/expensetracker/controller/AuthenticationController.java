@@ -1,7 +1,7 @@
 package com.bortnik.expensetracker.controller;
 
 import com.bortnik.expensetracker.dto.AuthResponse;
-import com.bortnik.expensetracker.dto.user.UserCreateDTO;
+import com.bortnik.expensetracker.dto.user.UserRegister;
 import com.bortnik.expensetracker.dto.user.UserLogin;
 import com.bortnik.expensetracker.service.AuthenticationService;
 import jakarta.validation.Valid;
@@ -20,7 +20,7 @@ class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @PostMapping("/register")
-    public AuthResponse registerUser(@Valid @RequestBody UserCreateDTO userCreateDTO) {
+    public AuthResponse registerUser(@Valid @RequestBody UserRegister userCreateDTO) {
         return authenticationService.register(userCreateDTO);
     }
 

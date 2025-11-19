@@ -1,17 +1,15 @@
 package com.bortnik.expensetracker.dto.expenses;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Value;
 
 import java.util.UUID;
 
-@Data
-@AllArgsConstructor
+@Value
 @Builder
 public class ExpensesUpdateDTO {
-    private UUID id;
-    private UUID userId;
-    private Double amount;
-    private String description;
+    UUID id;
+    UUID userId;
+    double amount;
+    String description;
 }

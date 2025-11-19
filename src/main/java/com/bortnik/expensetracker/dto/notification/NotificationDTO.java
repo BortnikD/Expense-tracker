@@ -1,14 +1,12 @@
 package com.bortnik.expensetracker.dto.notification;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Value;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-@Data
-@AllArgsConstructor
+@Value
 @Builder
 public class NotificationDTO {
     UUID id;

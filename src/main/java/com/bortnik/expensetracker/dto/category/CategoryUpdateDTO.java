@@ -1,16 +1,14 @@
 package com.bortnik.expensetracker.dto.category;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Value;
 
 import java.util.UUID;
 
-@Data
-@AllArgsConstructor
+@Value
 @Builder
 public class CategoryUpdateDTO {
-    private final UUID id;
-    private final UUID userId;
-    private final String name;
+    UUID id;
+    UUID userId;
+    String name;
 }

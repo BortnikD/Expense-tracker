@@ -1,11 +1,11 @@
 package com.bortnik.expensetracker.dto.budget;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Value;
 
 import java.util.UUID;
 
-@Data
+@Value
 @Builder
 public class BudgetUpdateExpenses {
     UUID id;

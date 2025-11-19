@@ -1,16 +1,14 @@
 package com.bortnik.expensetracker.dto.budget;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Value;
 
 import java.util.UUID;
 
-@Data
-@AllArgsConstructor
+@Value
 @Builder
 public class BudgetPlanUpdateDTO {
-    private UUID id;
-    private UUID userId;
-    private Double limitAmount;
+    UUID id;
+    UUID userId;
+    double limitAmount;
 }

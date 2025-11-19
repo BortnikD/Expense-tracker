@@ -1,7 +1,7 @@
 package com.bortnik.expensetracker.service;
 
 import com.bortnik.expensetracker.dto.AuthResponse;
-import com.bortnik.expensetracker.dto.user.UserCreateDTO;
+import com.bortnik.expensetracker.dto.user.UserRegister;
 import com.bortnik.expensetracker.dto.user.UserDTO;
 import com.bortnik.expensetracker.dto.user.UserLogin;
 import com.bortnik.expensetracker.security.JwtTokenProvider;
@@ -20,7 +20,7 @@ public class AuthenticationService {
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
 
-    public AuthResponse register(UserCreateDTO createUserDTO) {
+    public AuthResponse register(UserRegister createUserDTO) {
         createUserDTO.setPassword(passwordEncoder.encode(createUserDTO.getPassword()));
         UserDTO user = userService.saveUser(createUserDTO);
         String token = jwtTokenProvider.generateToken(user.getUsername());

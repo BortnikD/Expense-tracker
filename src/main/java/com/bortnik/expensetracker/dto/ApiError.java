@@ -3,21 +3,20 @@ package com.bortnik.expensetracker.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Value;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 
-@Data
+@Value
 @Builder
 public class ApiError {
-    private LocalDateTime timestamp;
-    private String error;
-    private String message;
-
-    private HttpStatus status;
+    LocalDateTime timestamp;
+    String error;
+    String message;
+    HttpStatus status;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Map<String, String> meta;
+    Map<String, String> meta;
 }
