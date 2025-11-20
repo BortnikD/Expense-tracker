@@ -1,8 +1,8 @@
 package com.bortnik.expensetracker.controller;
 
+import com.bortnik.expensetracker.controller.validator.DateValidator;
 import com.bortnik.expensetracker.dto.ApiResponse;
 import com.bortnik.expensetracker.dto.budget.*;
-import com.bortnik.expensetracker.exceptions.BadRequest;
 import com.bortnik.expensetracker.service.BudgetPlanService;
 import com.bortnik.expensetracker.service.UserService;
 import com.bortnik.expensetracker.util.ApiResponseFactory;
@@ -79,7 +79,7 @@ public class BudgetPlanController {
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody BudgetPlanCreateRequestDTO budgetPlanCreateRequestDTO
     ) {
-        validateDate(budgetPlanCreateRequestDTO.getMonth());
+        DateValidator.validateDateIsFuture(budgetPlanCreateRequestDTO.getMonth());
         BudgetPlanDTO budgetPlan = budgetPlanService.createBudgetPlan(
                 BudgetPlanCreateDTO.builder()
                         .userId(userService.getUserByUsername(userDetails.getUsername()).getId())
@@ -115,11 +115,5 @@ public class BudgetPlanController {
         UUID userId = userService.getUserByUsername(userDetails.getUsername()).getId();
         BudgetPlanDTO budgetPlan = budgetPlanService.deleteBudgetPlan(id, userId);
         return ApiResponseFactory.success(budgetPlan);
-    }
-
-    private void validateDate(LocalDate date) {
-        if (date.isBefore(LocalDate.now())) {
-            throw new BadRequest("Date cannot be before today");
-        }
     }
 }

@@ -1,8 +1,8 @@
 package com.bortnik.expensetracker.controller;
 
+import com.bortnik.expensetracker.controller.validator.DateValidator;
 import com.bortnik.expensetracker.dto.ApiResponse;
 import com.bortnik.expensetracker.dto.expenses.*;
-import com.bortnik.expensetracker.exceptions.BadRequest;
 import com.bortnik.expensetracker.service.ExpensesService;
 import com.bortnik.expensetracker.service.UserService;
 import com.bortnik.expensetracker.util.ApiResponseFactory;
@@ -29,7 +29,7 @@ public class ExpensesController {
             @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody ExpensesCreateRequestDTO expensesCreateRequestDTO
     ) {
-        validateDate(expensesCreateRequestDTO.getDate());
+        DateValidator.validateDateIsFuture(expensesCreateRequestDTO.getDate());
         ExpensesDTO expenses = expensesService.createExpenses(
                 ExpensesCreateDTO.builder()
                         .userId(userService.getUserByUsername(userDetails.getUsername()).getId())
@@ -48,6 +48,7 @@ public class ExpensesController {
             @RequestParam LocalDate startDate,
             @RequestParam LocalDate endDate
     ) {
+        DateValidator.validateEndDatePastStartDate(startDate, endDate);
         List<ExpensesDTO> expenses = expensesService.getExpensesBetweenDates(
                 userService.getUserByUsername(userDetails.getUsername()).getId(),
                 startDate,
@@ -63,6 +64,7 @@ public class ExpensesController {
             @RequestParam LocalDate startDate,
             @RequestParam LocalDate endDate
     ) {
+        DateValidator.validateEndDatePastStartDate(startDate, endDate);
         List<ExpensesDTO> expenses = expensesService.getUserExpensesByCategoryBetweenDates(
                 userService.getUserByUsername(userDetails.getUsername()).getId(),
                 categoryId,
@@ -98,11 +100,5 @@ public class ExpensesController {
                         .build()
         );
         return ApiResponseFactory.success(expenses);
-    }
-
-    private void validateDate(LocalDate date) {
-        if (date.isBefore(LocalDate.now())) {
-            throw new BadRequest("Date cannot be before today");
-        }
     }
 }
