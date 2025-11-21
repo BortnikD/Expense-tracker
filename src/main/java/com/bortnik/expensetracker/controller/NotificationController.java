@@ -5,11 +5,10 @@ import com.bortnik.expensetracker.dto.notification.NotificationDTO;
 import com.bortnik.expensetracker.security.service.UserDetailsImpl;
 import com.bortnik.expensetracker.service.NotificationService;
 import com.bortnik.expensetracker.util.ApiResponseFactory;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -27,13 +26,9 @@ public class NotificationController {
     @GetMapping("/all")
     public ApiResponse<Page<NotificationDTO>> getNotifications(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @PositiveOrZero(message = "page must be positive or zero")
-            @RequestParam int page,
-            @Positive(message = "page size must be positive")
-            @RequestParam int pageSize
+            @PageableDefault(size = 20) Pageable pageable
     ) {
         UUID userId = userDetails.getId();
-        Pageable pageable = Pageable.ofSize(pageSize).withPage(page);
         Page<NotificationDTO> notifications = notificationService.getNotifications(userId, pageable);
         return ApiResponseFactory.success(notifications);
     }
@@ -42,13 +37,9 @@ public class NotificationController {
     public ApiResponse<Page<NotificationDTO>> getNotificationsByRead(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestParam boolean isRead,
-            @PositiveOrZero(message = "page must be positive or zero")
-            @RequestParam int page,
-            @Positive(message = "page size must be positive")
-            @RequestParam int pageSize
+            @PageableDefault(size = 20) Pageable pageable
     ) {
         UUID userId = userDetails.getId();
-        Pageable pageable = Pageable.ofSize(pageSize).withPage(page);
         Page<NotificationDTO> notifications = notificationService.getNotificationsByRead(userId, isRead, pageable);
         return ApiResponseFactory.success(notifications);
     }
