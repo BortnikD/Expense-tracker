@@ -1,4 +1,4 @@
-package com.bortnik.expensetracker.security;
+package com.bortnik.expensetracker.security.service;
 
 import com.bortnik.expensetracker.entities.User;
 import com.bortnik.expensetracker.repository.UserRepository;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class MyUserDetailsService implements UserDetailsService {
+public class UserDetailsServiceImpl implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
@@ -18,13 +18,6 @@ public class MyUserDetailsService implements UserDetailsService {
         final User appUser = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
 
-        return org.springframework.security.core.userdetails.User
-                .withUsername(username)
-                .password(appUser.getPassword())
-                .accountExpired(false)
-                .accountLocked(false)
-                .credentialsExpired(false)
-                .disabled(false)
-                .build();
+        return UserDetailsImpl.build(appUser);
     }
 }

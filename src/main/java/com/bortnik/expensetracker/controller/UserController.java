@@ -2,13 +2,13 @@ package com.bortnik.expensetracker.controller;
 
 import com.bortnik.expensetracker.dto.ApiResponse;
 import com.bortnik.expensetracker.dto.user.UserDTO;
+import com.bortnik.expensetracker.security.service.UserDetailsImpl;
 import com.bortnik.expensetracker.service.UserService;
 import com.bortnik.expensetracker.util.ApiResponseFactory;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,8 +49,8 @@ public class UserController {
     }
 
     @GetMapping("/who-am-i")
-    public ApiResponse<UserDTO> getWhoAmI(@AuthenticationPrincipal UserDetails user) {
-        UserDTO userDTO = userService.getUserByUsername(user.getUsername());
+    public ApiResponse<UserDTO> getWhoAmI(@AuthenticationPrincipal UserDetailsImpl user) {
+        UserDTO userDTO = userService.getUserById(user.getId());
         return ApiResponseFactory.success(userDTO);
     }
 }

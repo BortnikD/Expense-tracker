@@ -2,13 +2,12 @@ package com.bortnik.expensetracker.controller;
 
 import com.bortnik.expensetracker.dto.ApiResponse;
 import com.bortnik.expensetracker.dto.category.*;
+import com.bortnik.expensetracker.security.service.UserDetailsImpl;
 import com.bortnik.expensetracker.service.CategoryService;
-import com.bortnik.expensetracker.service.UserService;
 import com.bortnik.expensetracker.util.ApiResponseFactory;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,16 +21,15 @@ import java.util.UUID;
 public class CategoryController {
 
     private final CategoryService categoryService;
-    private final UserService userService;
 
     @PostMapping
     public ApiResponse<CategoryDTO> createCategory(
             @Valid
             @RequestBody
             CategoryCreateRequestDTO categoryCreateRequestDTO,
-            @AuthenticationPrincipal UserDetails userDetails
+            @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        UUID userId = userService.getUserByUsername(userDetails.getUsername()).getId();
+        UUID userId = userDetails.getId();
         CategoryCreateDTO categoryCreateDTO = CategoryCreateDTO.builder()
                 .userId(userId)
                 .name(categoryCreateRequestDTO.getName())
@@ -45,9 +43,9 @@ public class CategoryController {
             @Valid
             @RequestBody
             CategoryUpdateRequestDTO categoryUpdateRequestDTO,
-            @AuthenticationPrincipal UserDetails userDetails
+            @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        UUID userId = userService.getUserByUsername(userDetails.getUsername()).getId();
+        UUID userId = userDetails.getId();
         CategoryUpdateDTO categoryUpdateDTO = CategoryUpdateDTO.builder()
                 .userId(userId)
                 .id(categoryUpdateRequestDTO.getId())
@@ -59,9 +57,9 @@ public class CategoryController {
 
     @GetMapping("/all")
     public ApiResponse<List<CategoryDTO>> getAllCategories(
-            @AuthenticationPrincipal UserDetails userDetails
+            @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        UUID userId = userService.getUserByUsername(userDetails.getUsername()).getId();
+        UUID userId = userDetails.getId();
         List<CategoryDTO> categories = categoryService.getAllByUserId(userId);
         return ApiResponseFactory.success(categories);
     }

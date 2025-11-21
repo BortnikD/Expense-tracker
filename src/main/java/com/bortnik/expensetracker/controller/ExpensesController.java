@@ -3,13 +3,12 @@ package com.bortnik.expensetracker.controller;
 import com.bortnik.expensetracker.controller.validator.DateValidator;
 import com.bortnik.expensetracker.dto.ApiResponse;
 import com.bortnik.expensetracker.dto.expenses.*;
+import com.bortnik.expensetracker.security.service.UserDetailsImpl;
 import com.bortnik.expensetracker.service.ExpensesService;
-import com.bortnik.expensetracker.service.UserService;
 import com.bortnik.expensetracker.util.ApiResponseFactory;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -22,17 +21,16 @@ import java.util.UUID;
 @Valid
 public class ExpensesController {
     private final ExpensesService expensesService;
-    private final UserService userService;
 
     @PostMapping
     public ApiResponse<ExpensesDTO> createExpenses(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @Valid @RequestBody ExpensesCreateRequestDTO expensesCreateRequestDTO
     ) {
         DateValidator.validateDateIsFuture(expensesCreateRequestDTO.getDate());
         ExpensesDTO expenses = expensesService.createExpenses(
                 ExpensesCreateDTO.builder()
-                        .userId(userService.getUserByUsername(userDetails.getUsername()).getId())
+                        .userId(userDetails.getId())
                         .categoryId(expensesCreateRequestDTO.getCategoryId())
                         .amount(expensesCreateRequestDTO.getAmount())
                         .description(expensesCreateRequestDTO.getDescription())
@@ -44,13 +42,13 @@ public class ExpensesController {
 
     @GetMapping("/all-between-dates")
     public ApiResponse<List<ExpensesDTO>> getExpensesBetweenDates(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestParam LocalDate startDate,
             @RequestParam LocalDate endDate
     ) {
         DateValidator.validateEndDatePastStartDate(startDate, endDate);
         List<ExpensesDTO> expenses = expensesService.getExpensesBetweenDates(
-                userService.getUserByUsername(userDetails.getUsername()).getId(),
+                userDetails.getId(),
                 startDate,
                 endDate
         );
@@ -59,14 +57,14 @@ public class ExpensesController {
 
     @GetMapping("/all-by-category")
     public ApiResponse<List<ExpensesDTO>> getExpensesBetweenDatesByCategory(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestParam UUID categoryId,
             @RequestParam LocalDate startDate,
             @RequestParam LocalDate endDate
     ) {
         DateValidator.validateEndDatePastStartDate(startDate, endDate);
         List<ExpensesDTO> expenses = expensesService.getUserExpensesByCategoryBetweenDates(
-                userService.getUserByUsername(userDetails.getUsername()).getId(),
+                userDetails.getId(),
                 categoryId,
                 startDate,
                 endDate
@@ -76,11 +74,11 @@ public class ExpensesController {
 
     @GetMapping("/all-by-date")
     public ApiResponse<List<ExpensesDTO>> getExpensesByDate(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestParam LocalDate date
     ) {
         List<ExpensesDTO> expenses = expensesService.getUserExpensesByDate(
-                userService.getUserByUsername(userDetails.getUsername()).getId(),
+                userDetails.getId(),
                 date
         );
         return ApiResponseFactory.success(expenses);
@@ -88,13 +86,13 @@ public class ExpensesController {
 
     @PatchMapping
     public ApiResponse<ExpensesDTO> updateExpenses(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @Valid @RequestBody ExpensesUpdateRequestDTO expensesUpdateRequestDTO
     ) {
         ExpensesDTO expenses = expensesService.updateExpenses(
                 ExpensesUpdateDTO.builder()
                         .id(expensesUpdateRequestDTO.getId())
-                        .userId(userService.getUserByUsername(userDetails.getUsername()).getId())
+                        .userId(userDetails.getId())
                         .amount(expensesUpdateRequestDTO.getAmount())
                         .description(expensesUpdateRequestDTO.getDescription())
                         .build()
