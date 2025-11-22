@@ -8,13 +8,13 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserLogin {
+final public class UserLogin {
 
     @NotBlank(message = "Username is required")
     @Size(min = 3, max = 255, message = "Username must be between 3 and 255 characters")
-    String username;
+    private String username;
 
     @NotBlank(message = "Password is required")
     @Size(min = 8, max = 255, message = "Password must be great then 8")
-    String password;
+    private String password;
 }
