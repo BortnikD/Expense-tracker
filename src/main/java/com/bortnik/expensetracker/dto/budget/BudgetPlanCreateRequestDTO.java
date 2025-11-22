@@ -11,7 +11,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BudgetPlanCreateRequestDTO {
+public final class BudgetPlanCreateRequestDTO {
     private UUID categoryId;
     @NotBlank(message = "userId is required")
     @Positive(message = "Limit amount must be positive")

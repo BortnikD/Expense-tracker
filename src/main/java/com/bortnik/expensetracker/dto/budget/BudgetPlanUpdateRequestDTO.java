@@ -10,7 +10,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BudgetPlanUpdateRequestDTO {
+public final class BudgetPlanUpdateRequestDTO {
     @NotBlank
     private UUID id;
     @NotBlank
