@@ -2,6 +2,7 @@ package com.bortnik.expensetracker.controller;
 
 import com.bortnik.expensetracker.dto.ApiError;
 import com.bortnik.expensetracker.dto.ApiResponse;
+import com.bortnik.expensetracker.exceptions.BadCredentials;
 import com.bortnik.expensetracker.exceptions.BadRequest;
 import com.bortnik.expensetracker.exceptions.auth.InvalidJwtToken;
 import com.bortnik.expensetracker.exceptions.budget.BudgetPlanAlreadyExists;
@@ -189,6 +190,17 @@ public class ExceptionsHandler {
                         .error("Method Argument Type Mismatch Exception")
                         .message(exception.getMessage())
                         .status(HttpStatus.BAD_REQUEST)
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(BadCredentials.class)
+    ResponseEntity<ApiResponse<ApiError>> handleBadCredentials(BadCredentials exception) {
+        return buildResponseEntity(
+                ApiError.builder()
+                        .error("Bad Credentials")
+                        .message(exception.getMessage())
+                        .status(HttpStatus.UNAUTHORIZED)
                         .build()
         );
     }
