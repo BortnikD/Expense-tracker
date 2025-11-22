@@ -8,6 +8,7 @@ import com.bortnik.expensetracker.dto.auth.UserLogin;
 import com.bortnik.expensetracker.entities.UserRole;
 import com.bortnik.expensetracker.exceptions.BadCredentials;
 import com.bortnik.expensetracker.security.jwt.JwtTokenProvider;
+import com.bortnik.expensetracker.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;

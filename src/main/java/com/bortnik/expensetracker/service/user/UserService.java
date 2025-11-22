@@ -1,4 +1,4 @@
-package com.bortnik.expensetracker.service;
+package com.bortnik.expensetracker.service.user;
 
 import com.bortnik.expensetracker.dto.user.UserCreateDTO;
 import com.bortnik.expensetracker.dto.user.UserDTO;

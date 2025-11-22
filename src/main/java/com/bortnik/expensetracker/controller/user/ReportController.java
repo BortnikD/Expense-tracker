@@ -1,4 +1,4 @@
-package com.bortnik.expensetracker.controller;
+package com.bortnik.expensetracker.controller.user;
 
 import com.bortnik.expensetracker.security.service.UserDetailsImpl;
 import com.bortnik.expensetracker.service.reports.ReportService;

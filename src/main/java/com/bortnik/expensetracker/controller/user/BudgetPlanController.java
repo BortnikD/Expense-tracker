@@ -1,4 +1,4 @@
-package com.bortnik.expensetracker.controller;
+package com.bortnik.expensetracker.controller.user;
 
 import com.bortnik.expensetracker.controller.validator.DateValidator;
 import com.bortnik.expensetracker.dto.ApiResponse;

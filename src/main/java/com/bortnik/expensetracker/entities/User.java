@@ -29,6 +29,7 @@ public class User {
 
     @Column
     @Enumerated(EnumType.STRING)
+    @Setter
     private UserRole role;
 
     @CreationTimestamp
@@ -36,6 +37,7 @@ public class User {
     private OffsetDateTime createdAt;
 
     @Column(name = "updated_at")
+    @Setter
     private OffsetDateTime updatedAt;
 
     @Override
