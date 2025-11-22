@@ -1,4 +1,4 @@
-package com.bortnik.expensetracker.security;
+package com.bortnik.expensetracker.security.jwt;
 
 import com.bortnik.expensetracker.exceptions.auth.InvalidJwtToken;
 import io.jsonwebtoken.Claims;
@@ -13,8 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 public class JwtTokenProvider {
@@ -33,8 +32,9 @@ public class JwtTokenProvider {
         this.secretKey = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(String username) {
+    public String generateToken(String username, Collection<String> roles) {
         Claims claims = Jwts.claims().setSubject(username);
+        claims.put("roles", roles);
 
         Date now = new Date();
         Date expirationDate = new Date(now.getTime() + expiration);

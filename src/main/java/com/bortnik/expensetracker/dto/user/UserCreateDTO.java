@@ -4,16 +4,11 @@ import com.bortnik.expensetracker.entities.UserRole;
 import lombok.Builder;
 import lombok.Value;
 
-import java.time.OffsetDateTime;
-import java.util.UUID;
-
 @Value
 @Builder
-public class UserDTO {
-    UUID id;
+public class UserCreateDTO {
     String username;
     String email;
+    String password;
     UserRole role;
-    OffsetDateTime createdAt;
-    OffsetDateTime updatedAt;
 }

@@ -1,4 +1,4 @@
-package com.bortnik.expensetracker.security;
+package com.bortnik.expensetracker.security.jwt;
 
 import com.bortnik.expensetracker.exceptions.auth.InvalidJwtToken;
 import com.bortnik.expensetracker.exceptions.auth.NoAuthorization;

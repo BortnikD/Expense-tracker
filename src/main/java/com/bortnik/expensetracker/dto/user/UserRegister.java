@@ -19,7 +19,6 @@ public final class UserRegister {
     @Email(message = "Email is invalid")
     private String email;
 
-    @Setter
     @NotBlank(message = "Password is required")
     @Size(min = 8, max = 255, message = "Password must be great then 8")
     private String password;

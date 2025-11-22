@@ -27,9 +27,16 @@ public class User {
     @Column
     private String password;
 
+    @Column
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
+
     @CreationTimestamp
     @Column(name = "created_at")
     private OffsetDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private OffsetDateTime updatedAt;
 
     @Override
     public boolean equals(Object o) {
@@ -43,3 +50,4 @@ public class User {
         return getClass().hashCode();
     }
 }
+
