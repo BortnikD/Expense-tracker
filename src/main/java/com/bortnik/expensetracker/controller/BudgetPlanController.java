@@ -15,7 +15,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -40,21 +39,23 @@ public class BudgetPlanController {
     }
 
     @GetMapping("/exceeding")
-    public ApiResponse<List<BudgetPlanDTO>> getExceedingBudgetPlans(
-            @AuthenticationPrincipal UserDetailsImpl userDetails
+    public ApiResponse<Page<BudgetPlanDTO>> getExceedingBudgetPlans(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @PageableDefault(size = 20) Pageable pageable
     ) {
         UUID userId = userDetails.getId();
-        List<BudgetPlanDTO> budgetPlans = budgetPlanService.getExceedingBudgetPlans(userId);
+        Page<BudgetPlanDTO> budgetPlans = budgetPlanService.getExceedingBudgetPlans(userId, pageable);
         return ApiResponseFactory.success(budgetPlans);
     }
 
     @GetMapping("/all-in-month")
-    public ApiResponse<List<BudgetPlanDTO>> getBudgetPlansByUserIdAndMonth(
+    public ApiResponse<Page<BudgetPlanDTO>> getBudgetPlansByUserIdAndMonth(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @RequestParam LocalDate month
+            @RequestParam LocalDate month,
+            @PageableDefault(size = 20) Pageable pageable
     ) {
         UUID userId = userDetails.getId();
-        List<BudgetPlanDTO> budgetPlans = budgetPlanService.getBudgetPlansByUserIdAndMonth(userId, month);
+        Page<BudgetPlanDTO> budgetPlans = budgetPlanService.getBudgetPlansByUserIdAndMonth(userId, month, pageable);
         return ApiResponseFactory.success(budgetPlans);
     }
 

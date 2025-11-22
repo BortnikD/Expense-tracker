@@ -8,11 +8,13 @@ import com.bortnik.expensetracker.service.ExpensesService;
 import com.bortnik.expensetracker.util.ApiResponseFactory;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -28,7 +30,7 @@ public class ExpensesController {
             @Valid @RequestBody ExpensesCreateRequestDTO expensesCreateRequestDTO
     ) {
         DateValidator.validateDateIsFuture(expensesCreateRequestDTO.getDate());
-        ExpensesDTO expenses = expensesService.createExpenses(
+        final ExpensesDTO expenses = expensesService.createExpenses(
                 ExpensesCreateDTO.builder()
                         .userId(userDetails.getId())
                         .categoryId(expensesCreateRequestDTO.getCategoryId())
@@ -41,46 +43,41 @@ public class ExpensesController {
     }
 
     @GetMapping("/all-between-dates")
-    public ApiResponse<List<ExpensesDTO>> getExpensesBetweenDates(
+    public ApiResponse<Page<ExpensesDTO>> getExpensesBetweenDates(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @RequestParam(required = false) UUID categoryId,
             @RequestParam LocalDate startDate,
-            @RequestParam LocalDate endDate
+            @RequestParam LocalDate endDate,
+            @PageableDefault(size = 20) Pageable pageable
     ) {
         DateValidator.validateEndDatePastStartDate(startDate, endDate);
-        List<ExpensesDTO> expenses = expensesService.getExpensesBetweenDates(
-                userDetails.getId(),
-                startDate,
-                endDate
-        );
-        return ApiResponseFactory.success(expenses);
-    }
-
-    @GetMapping("/all-by-category")
-    public ApiResponse<List<ExpensesDTO>> getExpensesBetweenDatesByCategory(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @RequestParam UUID categoryId,
-            @RequestParam LocalDate startDate,
-            @RequestParam LocalDate endDate
-    ) {
-        DateValidator.validateEndDatePastStartDate(startDate, endDate);
-        List<ExpensesDTO> expenses = expensesService.getUserExpensesByCategoryBetweenDates(
-                userDetails.getId(),
-                categoryId,
-                startDate,
-                endDate
-        );
+        final Page<ExpensesDTO> expenses = (categoryId  != null)
+                ? expensesService.getUserExpensesByCategoryBetweenDates(
+                        userDetails.getId(),
+                        categoryId,
+                        startDate,
+                        endDate,
+                        pageable
+                )
+                : expensesService.getExpensesBetweenDates(
+                        userDetails.getId(),
+                        startDate,
+                        endDate,
+                        pageable
+                );
         return ApiResponseFactory.success(expenses);
     }
 
     @GetMapping("/all-by-date")
-    public ApiResponse<List<ExpensesDTO>> getExpensesByDate(
+    public ApiResponse<Page<ExpensesDTO>> getExpensesByDate(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @RequestParam LocalDate date
+            @RequestParam LocalDate date,
+            @RequestParam(required = false) UUID categoryId,
+            @PageableDefault(size = 20) Pageable pageable
     ) {
-        List<ExpensesDTO> expenses = expensesService.getUserExpensesByDate(
-                userDetails.getId(),
-                date
-        );
+        final Page<ExpensesDTO> expenses = (categoryId != null)
+                ? expensesService.getUserExpensesByDateAndCategory(userDetails.getId(), categoryId, date, pageable)
+                : expensesService.getUserExpensesByDate(userDetails.getId(), date, pageable);
         return ApiResponseFactory.success(expenses);
     }
 
@@ -89,7 +86,7 @@ public class ExpensesController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @Valid @RequestBody ExpensesUpdateRequestDTO expensesUpdateRequestDTO
     ) {
-        ExpensesDTO expenses = expensesService.updateExpenses(
+        final ExpensesDTO expenses = expensesService.updateExpenses(
                 ExpensesUpdateDTO.builder()
                         .id(expensesUpdateRequestDTO.getId())
                         .userId(userDetails.getId())

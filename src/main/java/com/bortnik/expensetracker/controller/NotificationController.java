@@ -28,8 +28,8 @@ public class NotificationController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PageableDefault(size = 20) Pageable pageable
     ) {
-        UUID userId = userDetails.getId();
-        Page<NotificationDTO> notifications = notificationService.getNotifications(userId, pageable);
+        final UUID userId = userDetails.getId();
+        final Page<NotificationDTO> notifications = notificationService.getNotifications(userId, pageable);
         return ApiResponseFactory.success(notifications);
     }
 
@@ -39,8 +39,8 @@ public class NotificationController {
             @RequestParam boolean isRead,
             @PageableDefault(size = 20) Pageable pageable
     ) {
-        UUID userId = userDetails.getId();
-        Page<NotificationDTO> notifications = notificationService.getNotificationsByRead(userId, isRead, pageable);
+        final UUID userId = userDetails.getId();
+        final Page<NotificationDTO> notifications = notificationService.getNotificationsByRead(userId, isRead, pageable);
         return ApiResponseFactory.success(notifications);
     }
 

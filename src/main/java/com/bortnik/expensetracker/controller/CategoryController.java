@@ -7,11 +7,13 @@ import com.bortnik.expensetracker.service.CategoryService;
 import com.bortnik.expensetracker.util.ApiResponseFactory;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -56,11 +58,12 @@ public class CategoryController {
     }
 
     @GetMapping("/all")
-    public ApiResponse<List<CategoryDTO>> getAllCategories(
-            @AuthenticationPrincipal UserDetailsImpl userDetails
+    public ApiResponse<Page<CategoryDTO>> getAllCategories(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @PageableDefault(size = 20) Pageable pageable
     ) {
         UUID userId = userDetails.getId();
-        List<CategoryDTO> categories = categoryService.getAllByUserId(userId);
+        Page<CategoryDTO> categories = categoryService.getAllByUserId(userId, pageable);
         return ApiResponseFactory.success(categories);
     }
 }

@@ -12,9 +12,10 @@ import com.bortnik.expensetracker.repository.CategoryRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -47,11 +48,9 @@ public class CategoryService {
         return CategoryMapper.toDto(categoryRepository.save(category));
     }
 
-    public List<CategoryDTO> getAllByUserId(final UUID userId) {
-        return categoryRepository.findByUserId(userId)
-                .stream()
-                .map(CategoryMapper::toDto)
-                .toList();
+    public Page<CategoryDTO> getAllByUserId(final UUID userId, final Pageable pageable) {
+        return categoryRepository.findByUserId(userId, pageable)
+                .map(CategoryMapper::toDto);
     }
 
     @Cacheable(value = "categoryById", key = "#categoryId")

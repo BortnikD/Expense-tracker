@@ -60,7 +60,7 @@ public class NotificationService {
 
     @Transactional
     public void markNotificationAsRead(final UUID notificationId, final UUID userId) {
-        Notification notification = notificationRepository.findById(notificationId)
+        final Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() ->
                         new NotificationNotFound("Notification with id " + notificationId + " does not exist"));
 
@@ -98,7 +98,7 @@ public class NotificationService {
                 exceededPlan.getSpentAmount() - exceededPlan.getLimitAmount()
         );
 
-        NotificationCreateDTO notificationDto = NotificationCreateDTO.builder()
+        final NotificationCreateDTO notificationDto = NotificationCreateDTO.builder()
                 .userId(exceededPlan.getUserId())
                 .message(message)
                 .build();
@@ -121,7 +121,7 @@ public class NotificationService {
 
     @Transactional
     public void deleteNotActualNotifications() {
-        OffsetDateTime startMonth = OffsetDateTime.now().withDayOfMonth(1);
+        final OffsetDateTime startMonth = OffsetDateTime.now().withDayOfMonth(1);
         exceededBudgetNotificationLogRepository.deleteAllByNotifiedAtBefore(startMonth);
         log.info("Notifications before date {} were deleted", startMonth);
     }

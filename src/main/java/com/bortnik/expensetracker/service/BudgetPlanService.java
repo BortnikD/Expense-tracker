@@ -17,7 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -54,50 +53,53 @@ public class BudgetPlanService {
     }
 
     public Optional<BudgetPlanDTO> getOptionalBudgetPlanByUserIdAndCategoryIdAndMonth(
-            UUID userId,
-            UUID categoryId,
-            LocalDate month
+            final UUID userId,
+            final UUID categoryId,
+            final LocalDate month
     ) {
-        LocalDate startMonth = month.withDayOfMonth(1);
-        LocalDate endMonth = month.withDayOfMonth(month.lengthOfMonth());
+        final LocalDate startMonth = month.withDayOfMonth(1);
+        final LocalDate endMonth = month.withDayOfMonth(month.lengthOfMonth());
 
         return budgetPlanRepository.findByUserIdAndCategoryIdAndMonthBetween(userId, categoryId, startMonth, endMonth)
                 .map(BudgetPlanMapper::toDto);
     }
 
     public Optional<BudgetPlanDTO> getOptionalBudgetPlanByUserIdAndMonth(
-            UUID userId,
-            LocalDate month
+            final UUID userId,
+            final LocalDate month
     ) {
-        LocalDate startMonth = month.withDayOfMonth(1);
-        LocalDate endMonth = month.withDayOfMonth(month.lengthOfMonth());
+        final LocalDate startMonth = month.withDayOfMonth(1);
+        final LocalDate endMonth = month.withDayOfMonth(month.lengthOfMonth());
 
         return budgetPlanRepository.findByUserIdAndCategoryIdIsNullAndMonthBetween(userId, startMonth, endMonth)
                 .map(BudgetPlanMapper::toDto);
     }
 
-    public List<BudgetPlanDTO> getExceedingBudgetPlans(final UUID userId) {
-        return budgetPlanRepository.findByUserIdAndSpentAmountExceedsLimit(userId)
-                .stream()
-                .map(BudgetPlanMapper::toDto)
-                .toList();
+    public Page<BudgetPlanDTO> getExceedingBudgetPlans(
+            final UUID userId,
+            final Pageable pageable
+    ) {
+        return budgetPlanRepository.findByUserIdAndSpentAmountExceedsLimit(userId, pageable)
+                .map(BudgetPlanMapper::toDto);
     }
 
     public Page<BudgetPlanDTO> getAllBySpentAmountExceedsLimit(Pageable pageable) {
-        LocalDate now = LocalDate.now();
-        LocalDate startMonth = now.withDayOfMonth(1);
-        LocalDate endMonth = now.withDayOfMonth(now.lengthOfMonth());
+        final LocalDate now = LocalDate.now();
+        final LocalDate startMonth = now.withDayOfMonth(1);
+        final LocalDate endMonth = now.withDayOfMonth(now.lengthOfMonth());
         return budgetPlanRepository.findAllBySpentAmountExceedsLimitAndMonthBetween(pageable, startMonth, endMonth)
                 .map(BudgetPlanMapper::toDto);
     }
 
-    public List<BudgetPlanDTO> getBudgetPlansByUserIdAndMonth(final UUID userId, final LocalDate month) {
-        LocalDate startMonth = month.withDayOfMonth(1);
-        LocalDate endMonth = month.withDayOfMonth(month.lengthOfMonth());
-        return budgetPlanRepository.findByUserIdAndMonthBetween(userId, startMonth, endMonth)
-                .stream()
-                .map(BudgetPlanMapper::toDto)
-                .toList();
+    public Page<BudgetPlanDTO> getBudgetPlansByUserIdAndMonth(
+            final UUID userId,
+            final LocalDate month,
+            final Pageable pageable
+    ) {
+        final LocalDate startMonth = month.withDayOfMonth(1);
+        final LocalDate endMonth = month.withDayOfMonth(month.lengthOfMonth());
+        return budgetPlanRepository.findByUserIdAndMonthBetween(userId, startMonth, endMonth, pageable)
+                .map(BudgetPlanMapper::toDto);
     }
 
     public Page<BudgetPlanDTO> getAllBudgetPlans(final UUID userId, Pageable pageable) {
@@ -151,7 +153,7 @@ public class BudgetPlanService {
      * by adding the value of the expenses. If the budget plan does not exist, an exception is thrown.
      *
      * @param budgetUpdateExpenses an object containing the ID of the budget plan to update and
-     *                             the amount of expenses to append
+     *                             the number of expenses to append
      * @throws BudgetPlanNotFound if the budget plan with the specified ID does not exist
      */
     @Transactional

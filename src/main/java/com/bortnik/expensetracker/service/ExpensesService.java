@@ -13,10 +13,11 @@ import com.bortnik.expensetracker.repository.ExpensesRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -37,44 +38,45 @@ public class ExpensesService {
         return expensesDTO;
     }
 
-    public List<ExpensesDTO> getExpensesBetweenDates(
+    public Page<ExpensesDTO> getExpensesBetweenDates(
             final UUID userId,
             final LocalDate startDate,
-            final LocalDate endDate
+            final LocalDate endDate,
+            final Pageable pageable
     ) {
-        return ExpensesMapper.toDtoList(
-                expensesRepository.findByUserIdAndDateBetween(userId, startDate, endDate)
-        );
+        return expensesRepository.findByUserIdAndDateBetween(userId, startDate, endDate, pageable)
+                .map(ExpensesMapper::toDto);
     }
 
-    public List<ExpensesDTO> getUserExpensesByCategoryBetweenDates(
+    public Page<ExpensesDTO> getUserExpensesByCategoryBetweenDates(
             final UUID userId,
             final UUID categoryId,
             final LocalDate startDate,
-            final LocalDate endDate
+            final LocalDate endDate,
+            final Pageable pageable
     ) {
-        return ExpensesMapper.toDtoList(
-                expensesRepository.findByUserIdAndCategoryIdAndDateBetween(userId, categoryId, startDate, endDate)
-        );
+        return expensesRepository.findByUserIdAndCategoryIdAndDateBetween(
+                userId, categoryId, startDate, endDate, pageable
+        ).map(ExpensesMapper::toDto);
     }
 
-    public List<ExpensesDTO> getUserExpensesByDate(
+    public Page<ExpensesDTO> getUserExpensesByDate(
             final UUID userId,
-            final LocalDate date
+            final LocalDate date,
+            final Pageable pageable
     ) {
-        return ExpensesMapper.toDtoList(
-                expensesRepository.findByUserIdAndDate(userId, date)
-        );
+        return expensesRepository.findByUserIdAndDate(userId, date, pageable)
+                .map(ExpensesMapper::toDto);
     }
 
-    public List<ExpensesDTO> getUserExpensesByDateAndCategory(
+    public Page<ExpensesDTO> getUserExpensesByDateAndCategory(
             final UUID userId,
             final UUID categoryId,
-            final LocalDate date
+            final LocalDate date,
+            final Pageable pageable
     ) {
-        return ExpensesMapper.toDtoList(
-                expensesRepository.findByUserIdAndCategoryIdAndDate(userId, categoryId, date)
-        );
+        return expensesRepository.findByUserIdAndCategoryIdAndDate(userId, categoryId, date, pageable)
+                .map(ExpensesMapper::toDto);
     }
 
     @Transactional

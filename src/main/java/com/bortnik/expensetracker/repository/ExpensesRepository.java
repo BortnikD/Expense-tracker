@@ -1,23 +1,38 @@
 package com.bortnik.expensetracker.repository;
 
 import com.bortnik.expensetracker.entities.Expenses;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 @Repository
 public interface ExpensesRepository extends JpaRepository<Expenses, UUID> {
 
-    List<Expenses> findByUserIdAndDateBetween(UUID userId, LocalDate startDate, LocalDate endDate);
-
-    List<Expenses> findByUserIdAndCategoryIdAndDateBetween(
-            UUID userId, UUID categoryId, LocalDate startDate, LocalDate endDate
+    Page<Expenses> findByUserIdAndDateBetween(
+            UUID userId,
+            LocalDate startDate,
+            LocalDate endDate,
+            Pageable pageable
     );
 
-    List<Expenses> findByUserIdAndDate(UUID userId, LocalDate date);
+    Page<Expenses> findByUserIdAndCategoryIdAndDateBetween(
+            UUID userId,
+            UUID categoryId,
+            LocalDate startDate,
+            LocalDate endDate,
+            Pageable pageable
+    );
 
-    List<Expenses> findByUserIdAndCategoryIdAndDate(UUID userId, UUID categoryId, LocalDate date);
+    Page<Expenses> findByUserIdAndDate(UUID userId, LocalDate date, Pageable pageable);
+
+    Page<Expenses> findByUserIdAndCategoryIdAndDate(
+            UUID userId,
+            UUID categoryId,
+            LocalDate date,
+            Pageable pageable
+    );
 }

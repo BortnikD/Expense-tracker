@@ -4,8 +4,6 @@ import com.bortnik.expensetracker.dto.expenses.ExpensesCreateDTO;
 import com.bortnik.expensetracker.dto.expenses.ExpensesDTO;
 import com.bortnik.expensetracker.entities.Expenses;
 
-import java.util.List;
-
 public class ExpensesMapper {
     public static Expenses toEntity(ExpensesCreateDTO expensesCreateDTO) {
         return Expenses.builder()
@@ -26,11 +24,5 @@ public class ExpensesMapper {
                 .date(expenses.getDate())
                 .description(expenses.getDescription())
                 .build();
-    }
-
-    public static List<ExpensesDTO> toDtoList(final List<Expenses> expensesList) {
-        return expensesList.stream()
-                .map(ExpensesMapper::toDto)
-                .toList();
     }
 }
