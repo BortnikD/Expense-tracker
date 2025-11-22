@@ -1,4 +1,4 @@
-package com.bortnik.expensetracker.dto;
+package com.bortnik.expensetracker.dto.auth;
 
 import lombok.Builder;
 import lombok.Value;

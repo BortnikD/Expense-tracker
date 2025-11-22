@@ -1,10 +1,10 @@
 package com.bortnik.expensetracker.service;
 
-import com.bortnik.expensetracker.dto.AuthResponse;
+import com.bortnik.expensetracker.dto.auth.AuthResponse;
 import com.bortnik.expensetracker.dto.user.UserCreateDTO;
-import com.bortnik.expensetracker.dto.user.UserRegister;
+import com.bortnik.expensetracker.dto.auth.UserRegister;
 import com.bortnik.expensetracker.dto.user.UserDTO;
-import com.bortnik.expensetracker.dto.user.UserLogin;
+import com.bortnik.expensetracker.dto.auth.UserLogin;
 import com.bortnik.expensetracker.entities.UserRole;
 import com.bortnik.expensetracker.exceptions.BadCredentials;
 import com.bortnik.expensetracker.security.jwt.JwtTokenProvider;

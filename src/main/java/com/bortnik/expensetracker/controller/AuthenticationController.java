@@ -1,9 +1,9 @@
 package com.bortnik.expensetracker.controller;
 
 import com.bortnik.expensetracker.dto.ApiResponse;
-import com.bortnik.expensetracker.dto.AuthResponse;
-import com.bortnik.expensetracker.dto.user.UserRegister;
-import com.bortnik.expensetracker.dto.user.UserLogin;
+import com.bortnik.expensetracker.dto.auth.AuthResponse;
+import com.bortnik.expensetracker.dto.auth.UserRegister;
+import com.bortnik.expensetracker.dto.auth.UserLogin;
 import com.bortnik.expensetracker.service.AuthenticationService;
 import com.bortnik.expensetracker.util.ApiResponseFactory;
 import jakarta.validation.Valid;
