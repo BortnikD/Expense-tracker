@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Getter
@@ -33,6 +34,13 @@ public class Expenses {
     @Setter
     @Column
     private String description;
+
+    @Column(name = "created_at")
+    private OffsetDateTime createdAt;
+
+    @Column(name = "updated_at")
+    @Setter
+    private OffsetDateTime updatedAt;
 
     @Override
     public boolean equals(Object o) {

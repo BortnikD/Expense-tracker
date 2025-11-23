@@ -41,6 +41,10 @@ public class NotificationService {
         );
     }
 
+    public long getCountOfUnreadUserMessages(final UUID userId) {
+        return notificationRepository.countAllByUserIdAndRead(userId, false);
+    }
+
     public Page<NotificationDTO> getNotifications(
             final UUID userId,
             final Pageable pageable

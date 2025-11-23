@@ -1,6 +1,7 @@
 package com.bortnik.expensetracker.service;
 
 import com.bortnik.expensetracker.dto.notification.NotificationDTO;
+import com.bortnik.expensetracker.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;

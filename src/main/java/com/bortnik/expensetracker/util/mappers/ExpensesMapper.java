@@ -23,6 +23,8 @@ public class ExpensesMapper {
                 .amount(expenses.getAmount())
                 .date(expenses.getDate())
                 .description(expenses.getDescription())
+                .createdAt(expenses.getCreatedAt())
+                .updatedAt(expenses.getUpdatedAt())
                 .build();
     }
 }

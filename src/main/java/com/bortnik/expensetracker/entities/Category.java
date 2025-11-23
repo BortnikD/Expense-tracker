@@ -2,7 +2,9 @@ package com.bortnik.expensetracker.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Getter
@@ -25,6 +27,14 @@ public class Category {
     @Setter
     @Column
     private String name;
+
+    @CreationTimestamp
+    @Column
+    private OffsetDateTime createdAt;
+
+    @Column
+    @Setter
+    private OffsetDateTime updatedAt;
 
     @Override
     public boolean equals(Object o) {

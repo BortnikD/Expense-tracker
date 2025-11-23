@@ -10,6 +10,8 @@ public class CategoryMapper {
                 .id(category.getId())
                 .userId(category.getUserId())
                 .name(category.getName())
+                .createdAt(category.getCreatedAt())
+                .updatedAt(category.getUpdatedAt())
                 .build();
     }
 

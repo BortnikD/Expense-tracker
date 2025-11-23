@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -144,6 +145,8 @@ public class BudgetPlanService {
         }
 
         budgetPlan.setLimitAmount(budgetPlanUpdateDTO.getLimitAmount());
+        budgetPlan.setUpdatedAt(OffsetDateTime.now());
+
         return BudgetPlanMapper.toDto(budgetPlanRepository.save(budgetPlan));
     }
 
@@ -163,6 +166,7 @@ public class BudgetPlanService {
                         " does not exist"));
 
         budgetPlan.setSpentAmount(budgetPlan.getSpentAmount() + budgetUpdateExpenses.getSpentAmount());
+        budgetPlan.setUpdatedAt(OffsetDateTime.now());
 
         BudgetPlanMapper.toDto(budgetPlanRepository.save(budgetPlan));
     }

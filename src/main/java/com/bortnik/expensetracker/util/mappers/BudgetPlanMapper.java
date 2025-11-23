@@ -13,6 +13,8 @@ public class BudgetPlanMapper {
                 .limitAmount(budgetPlan.getLimitAmount())
                 .spentAmount(budgetPlan.getSpentAmount())
                 .month(budgetPlan.getMonth())
+                .createdAt(budgetPlan.getCreatedAt())
+                .updatedAt(budgetPlan.getUpdatedAt())
                 .build();
     }
 

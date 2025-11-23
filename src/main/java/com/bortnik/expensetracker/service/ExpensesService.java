@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Service
@@ -91,6 +92,7 @@ public class ExpensesService {
 
         expenses.setAmount(expensesUpdateDTO.getAmount());
         expenses.setDescription(expensesUpdateDTO.getDescription());
+        expenses.setUpdatedAt(OffsetDateTime.now());
         return ExpensesMapper.toDto(expensesRepository.save(expenses));
     }
 
@@ -99,13 +101,15 @@ public class ExpensesService {
 
         if (expensesDTO.getCategoryId() != null) {
             budgetPlanService.getOptionalBudgetPlanByUserIdAndCategoryIdAndMonth(
-                            expensesDTO.getUserId(), expensesDTO.getCategoryId(), currentMonth)
+                            expensesDTO.getUserId(), expensesDTO.getCategoryId(), currentMonth
+                    )
                     .map(BudgetPlanDTO::getId)
                     .ifPresent(id -> updateBudgetPlan(id, expensesDTO.getAmount(), "Category"));
         }
 
         budgetPlanService.getOptionalBudgetPlanByUserIdAndMonth(
-                        expensesDTO.getUserId(), currentMonth)
+                        expensesDTO.getUserId(), currentMonth
+                )
                 .map(BudgetPlanDTO::getId)
                 .ifPresent(id -> updateBudgetPlan(id, expensesDTO.getAmount(), "User"));
     }

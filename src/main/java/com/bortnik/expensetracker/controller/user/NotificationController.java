@@ -1,4 +1,4 @@
-package com.bortnik.expensetracker.controller;
+package com.bortnik.expensetracker.controller.user;
 
 import com.bortnik.expensetracker.dto.ApiResponse;
 import com.bortnik.expensetracker.dto.notification.NotificationDTO;
@@ -22,6 +22,15 @@ import java.util.UUID;
 public class NotificationController {
 
     private final NotificationService notificationService;
+
+    @GetMapping("/count")
+    public ApiResponse<Long> getCountOfUnreadUserMessages(
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        final UUID userId = userDetails.getId();
+        final Long count = notificationService.getCountOfUnreadUserMessages(userId);
+        return ApiResponseFactory.success(count);
+    }
 
     @GetMapping("/all")
     public ApiResponse<Page<NotificationDTO>> getNotifications(
@@ -49,7 +58,7 @@ public class NotificationController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable UUID notificationId
     ) {
-        UUID userId = userDetails.getId();
+        final UUID userId = userDetails.getId();
         notificationService.markNotificationAsRead(notificationId, userId);
         return ApiResponseFactory.success(null);
     }

@@ -2,8 +2,10 @@ package com.bortnik.expensetracker.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Getter
@@ -36,6 +38,14 @@ public class BudgetPlan {
 
     @Column
     private LocalDate month;
+
+    @CreationTimestamp
+    @Column(name = "created_at")
+    private OffsetDateTime createdAt;
+
+    @Column(name = "updated_at")
+    @Setter
+    private OffsetDateTime updatedAt;
 
     @Override
     public boolean equals(Object o) {

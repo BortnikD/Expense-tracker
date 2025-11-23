@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Service
@@ -45,6 +46,7 @@ public class CategoryService {
         }
 
         category.setName(categoryUpdate.getName());
+        category.setUpdatedAt(OffsetDateTime.now());
         return CategoryMapper.toDto(categoryRepository.save(category));
     }
 

@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Value;
 
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Value
@@ -15,4 +16,6 @@ public class ExpensesDTO {
     double amount;
     LocalDate date;
     String description;
+    OffsetDateTime createdAt;
+    OffsetDateTime updatedAt;
 }
