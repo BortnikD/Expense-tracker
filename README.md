@@ -102,14 +102,14 @@ src/main/resources/
 ## Default Admin Account
 On first run, an admin account is created:
 
-Username: Configured via `ADMIN_USERNAME`
-Password: Configured via `ADMIN_PASSWORD`
-Role: `ADMIN`
+Username: Configured via `ADMIN_USERNAME`  
+Password: Configured via `ADMIN_PASSWORD`  
+Role: `ADMIN`  
 
 ## WebSocket Support
 
-Real-time notifications via WebSocket endpoint: `ws://localhost:8080/ws`
-Subscribe to user-specific notifications: `/user/{userId}/notifications`
+Real-time notifications via WebSocket endpoint: `ws://localhost:8080/ws`  
+Subscribe to user-specific notifications: `/user/{userId}/notifications`  
 
 *Example (JavaScript):*
 ```js
