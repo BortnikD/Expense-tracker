@@ -40,7 +40,7 @@ cd ExpenseTracker
 ```bash
 cp .env.example .env
 ```
-**Сhange the variables to your own!!!**
+**Сhange the variables to your own!!!**  
 4) Run build
 ```bash
 docker compose up --build
