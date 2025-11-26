@@ -36,11 +36,10 @@ git clone https://github.com/BortnikD/Expense-tracker
    ```bash
 cd ExpenseTracker
    ```
-3) Set up your .env file
+3) Set up your .env file. **Сhange the variables to your own!!!**  
 ```bash
 cp .env.example .env
 ```
-**Сhange the variables to your own!!!**  
 4) Run build
 ```bash
 docker compose up --build
