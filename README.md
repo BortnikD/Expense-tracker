@@ -14,11 +14,11 @@ A Spring Boot application for managing personal finances, tracking expenses, and
 - RESTful API with Swagger documentation
 - Caching support (Caffeine)
 # Tech Stack
-- **Backend:** Spring Boot 3.x, Java 17
+- **Backend:** Spring Boot 3.5.7, Java 21
 - **Security:** Spring Security with JWT
-- **Database:** PostgreSQL 12+
+- **Database:** PostgreSQL
 - **Migration:** Flyway
-- **Build Tool:** Gradle 8.x
+- **Build Tool:** Gradle
 - **Documentation:** Swagger/OpenAPI
 - **Real-time Communication:** WebSocket (STOMP)
 - **Validation:** Jakarta Bean Validation
